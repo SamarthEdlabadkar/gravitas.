@@ -2,20 +2,18 @@ import { useState } from "react";
 import { Search, Play, FileText, BookOpenText } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import heroBg from "@/assets/hero-bg.jpg";
-import cloudBg from "@/assets/cloud-bg.jpg"
 import nebulaBg from "@/assets/carinanebula3-bg.jpg"
-import galaxyBg from "@/assets/galaxy1-bg.jpg"
 import demoPreview from "@/assets/demo-preview.jpg";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      console.log("Searching for:", searchQuery);
-      // Add search functionality here
+      navigate("/network")
     }
   };
 
@@ -88,7 +86,7 @@ const Index = () => {
       </div>
 
       {/* Information Sections */}
-      <div className="w-full max-w-7xl mx-auto px-4">
+      <div className="w-full max-w-7xl mx-auto px-4 pt-64">
         <div className="grid md:grid-cols-3 gap-8">
           <Card className="bg-card/50 backdrop-blur-lg border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl group">
             <CardHeader className="space-y-4">
