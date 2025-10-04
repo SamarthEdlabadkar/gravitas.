@@ -26,19 +26,18 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full relative z-0 ">
+    <div
+        className="absolute inset-0 w-full h-full opacity-25 -z-10"
+        style={{
+          backgroundImage: `url(${nebulaBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      />
       {/* Hero Section with Background */}
       <div className="relative min-h-[70vh] flex flex-col items-center justify-center px-4">
-        <div 
-          className="absolute inset-0 opacity-50"
-          style={{
-            backgroundImage: `url(${nebulaBg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/80 to-background" />
         
         <div className="relative w-full max-w-4xl space-y-8 animate-fade-in">
           <div className="text-center space-y-4">
@@ -74,7 +73,7 @@ const Index = () => {
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-primary/60" />
-              10M+ Research Papers
+              2K+ Research Papers
             </span>
             <span className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-primary/60" />
@@ -91,7 +90,7 @@ const Index = () => {
       {/* Information Sections */}
       <div className="w-full max-w-7xl mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-8">
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl group">
+          <Card className="bg-card/50 backdrop-blur-lg border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl group">
             <CardHeader className="space-y-4">
               <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform duration-300">
                 <BookOpenText size={"38px"}/>
@@ -107,7 +106,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl group">
+          <Card className="bg-card/50 backdrop-blur-lg border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl group">
             <CardHeader className="space-y-4">
               <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform duration-300">
                 <FileText size={"38px"}/>
@@ -123,7 +122,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl group">
+          <Card className="bg-card/50 backdrop-blur-lg border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl group">
             <CardHeader className="space-y-4">
               <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform duration-300">
                 <Play className="w-10 h-10 text-primary" />
