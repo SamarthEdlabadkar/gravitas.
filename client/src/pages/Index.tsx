@@ -86,7 +86,7 @@ const Index = () => {
       </div>
 
       {/* Information Sections */}
-      <div className="w-full max-w-7xl mx-auto px-4 pt-64">
+      <div className="w-full max-w-7xl mx-auto px-4 ">
         <div className="grid md:grid-cols-3 gap-8">
           <Card className="bg-card/50 backdrop-blur-lg border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl group">
             <CardHeader className="space-y-4">
