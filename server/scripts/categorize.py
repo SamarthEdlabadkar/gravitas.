@@ -1,8 +1,11 @@
+import os
+from time import sleep
+from groq import Groq
 import instructor
 
 from pydantic import BaseModel, Field
 from typing import Dict, List, Any
-
+from dotenv import load_dotenv
 
 import json
 import csv
@@ -21,11 +24,12 @@ topics = [
     "Unique Biological Adaptations and Models"
 ]
 
-# Initialize the Ollama client with Instructor
-client = instructor.from_provider(
-    model = "ollama/llama3.1",
-    mode=instructor.Mode.JSON
-)
+load_dotenv()
+api_key = os.getenv("GROQ_API_KEY")
+
+client = Groq(api_key=api_key)
+
+client = instructor.from_groq(client, mode=instructor.Mode.JSON)
 
 # Define the structured output schema
 class PaperClassification(BaseModel):
@@ -56,13 +60,18 @@ ABSTRACT: {abstract}
 """
     # Use Instructor to enforce schema validation
     result = client.chat.completions.create(
-        messages=[{"role": "user", "content": prompt}],
-        response_model=PaperClassification,
-        max_retries=2,
-        timeout = 30
-    )
+        model='llama-3.1-8b-instant',  # currently working - llama-3.3-70b-versatile, llama3-8b-8192
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.2,
+        max_retries=3,
+        response_model=PaperClassification
+    ) # type:ignore
     return result
-
 
 # Database file
 DB_FILE = "server/static/papers.db"
@@ -128,11 +137,14 @@ if __name__ == "__main__":
     data = read_columns("server/static/extracted_article_data.csv")
     init_db()
 
-    for idx, (title, abstract) in enumerate(data[94:]):
-        print(idx+94)
+    for idx, (title, abstract) in enumerate(data[406:]):
+        print(idx+406)
         try:
             classification = classify_paper(title, abstract)
             classification_result = classification.model_dump()["selected_categories"]
             store_classification(title, classification_result)
-        except:
-            pass
+        except Exception as e:
+            print(e)
+
+        if (idx+178) % 25 == 0:
+            sleep(40)
