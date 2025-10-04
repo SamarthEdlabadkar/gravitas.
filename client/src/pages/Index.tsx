@@ -4,6 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import heroBg from "@/assets/hero-bg.jpg";
+import cloudBg from "@/assets/cloud-bg.jpg"
+import nebulaBg from "@/assets/carinanebula3-bg.jpg"
+import galaxyBg from "@/assets/galaxy1-bg.jpg"
 import demoPreview from "@/assets/demo-preview.jpg";
 
 const Index = () => {
@@ -27,9 +30,9 @@ const Index = () => {
       {/* Hero Section with Background */}
       <div className="relative min-h-[70vh] flex flex-col items-center justify-center px-4">
         <div 
-          className="absolute inset-0 opacity-25"
+          className="absolute inset-0 opacity-50"
           style={{
-            backgroundImage: `url(${heroBg})`,
+            backgroundImage: `url(${nebulaBg})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
