@@ -1,157 +1,212 @@
 import requests
+import xml.etree.ElementTree as ET
+import csv
+import re
 import time
-import os
-import csv  # Import the csv library
-import re   # Import re for regular expression matching
+from typing import List, Dict, Any, Optional
 
-# --- Configuration (Mandatory: Fill these out) ---
-# NCBI requests that you provide an email and tool name. 
-# Providing an API key (obtainable via your NCBI account) significantly 
-# increases the request rate limit from 3 to 10 requests per second.
-USER_EMAIL = "krishkalathiya@gmail.com"  # <-- REQUIRED: Replace with your email
-TOOL_NAME = "MyPmcDownloaderScript"   # <-- REQUIRED: A descriptive name for your script
-API_KEY = "75b9ccde4088e853b8412e19287673d80e08"   
+# --- Configuration ---
+NCBI_API_URL = r"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+OUTPUT_CSV_FILENAME = r"server\static\extracted_article_data.csv"
+INPUT_CSV_FILENAME = r"server\static\publications.csv"
 
-# --- Constants ---
-BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-DB_NAME = "pmc"
-BATCH_SIZE = 250  # Number of IDs per API request (max is 10,000, but 250 is safer for stability)
-DELAY_SECONDS = 1.0 # Delay between batches (1 sec is safe for unkeyed requests)
-INPUT_FILE = "pmc_data.csv" # Updated to CSV file name
-OUTPUT_DIR = "downloaded_pmc_xml"
+# Define the sections we want to extract from the XML body
+TARGET_SECTIONS = [
+    "Abstract", "Introduction", "Methods", "Results", 
+    "Discussion", "Outcomes", "Conclusion"
+]
 
-def extract_pmcid_from_url(url):
+def get_pmcid_from_url(url: str) -> Optional[str]:
     """
-    Extracts the numerical PMC ID from a full PMC article URL.
-    E.g., "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4136787/" -> "4136787"
+    Extracts the PMC ID (e.g., PMC4136787) from a PubMed Central URL.
+    The pattern is usually /articles/PMC<number>/ or /PMC<number>
     """
-    # Regex to find the PMC ID which follows /PMC(\d+)/
-    match = re.search(r'PMC(\d+)', url, re.IGNORECASE)
-    if match:
-        # Return the captured group (the digits)
-        return match.group(1)
-    return None
+    match = re.search(r'(PMC\d+)', url, re.IGNORECASE)
+    return match.group(1) if match else None
 
-def read_pmc_ids(filename):
-    """Reads IDs from the CSV file, extracting the PMC ID from the URL column (index 1)."""
-    print(f"Reading data from CSV file: {filename}...")
-    pmc_ids = []
+def extract_text(element: Optional[ET.Element]) -> str:
+    """
+    Extracts all text content from an XML element, including text from nested tags.
+    """
+    if element is None:
+        return ""
+    
+    # Use itertext() to get all text nodes from the element and its descendants
+    # and join them, stripping whitespace from individual text parts.
+    text_parts = [text.strip() for text in element.itertext() if text and text.strip()]
+    return " ".join(text_parts)
+
+def extract_article_section(root: ET.Element, title_pattern: str) -> str:
+    """
+    Locates a section by its title or sec-type and extracts its full text content.
+    The section tag is often <sec>, but the abstract is <abstract>.
+    """
+    lower_pattern = title_pattern.lower()
+
+    # Handle the Abstract section specifically (it's not always in a <sec> tag)
+    if lower_pattern == "abstract":
+        return extract_text(root.find(".//abstract"))
+    
+    # Handle General Outcomes (based on the previous inspection, it was sec id="s4")
+    if lower_pattern == "outcomes" or lower_pattern == "general outcomes":
+        outcomes_elem = root.find(".//sec[@id='s4']")
+        return extract_text(outcomes_elem)
+
+    # Handle Conclusion (based on the previous inspection, it was sec id="s5")
+    if lower_pattern == "conclusion":
+        conclusion_elem = root.find(".//sec[@id='s5']")
+        # Fallback to general finding by title if the specific ID is not present
+        if conclusion_elem is not None:
+            return extract_text(conclusion_elem)
+        
+    # 1. Try finding by partial title match
+    for title_elem in root.findall('.//sec/title'):
+        if title_elem.text and lower_pattern in title_elem.text.lower():
+            return extract_text(title_elem)
+
+    # 2. Try finding by sec-type attribute
+    sec_elem = root.find(f".//sec[@sec-type='{lower_pattern}']")
+    if sec_elem is not None:
+        return extract_text(sec_elem)
+
+    return ""
+
+def fetch_and_parse_article(pmcid: str) -> Dict[str, Any]:
+    """
+    Fetches XML for a given PMC ID and parses it into a dictionary of data.
+    """
+    params = {
+        "db": "pmc",
+        "id": pmcid,
+        "retmode": "xml"
+    }
+    
+    max_retries = 3
+    retry_delay = 1  # seconds
+
+    for attempt in range(max_retries):
+        try:
+            r = requests.get(NCBI_API_URL, params=params, timeout=30)
+            r.raise_for_status()
+            xml_content = r.text
+            
+            # Use ElementTree to parse the XML
+            root = ET.fromstring(xml_content)
+            
+            # --- 1. Extract Core Metadata ---
+            article_title = extract_text(root.find(".//article-title"))
+            journal_title = extract_text(root.find(".//journal-title"))
+            doi = root.findtext(".//article-id[@pub-id-type='doi']")
+            pub_year = root.findtext(".//pub-date/year")
+
+            # Authors (join first name initial and surname)
+            authors = []
+            for contrib in root.findall(".//contrib-group/contrib[@contrib-type='author']"):
+                surname = contrib.findtext(".//surname")
+                given_names = contrib.findtext(".//given-names")
+                initial = given_names.split()[0][0] if given_names else ''
+                authors.append(f"{surname}, {initial}")
+            author_list = "; ".join(authors)
+
+            # --- 2. Extract Article Sections ---
+            data_sections = {}
+            for section in TARGET_SECTIONS:
+                data_sections[section] = extract_article_section(root, section)
+            
+            # Combine all extracted data
+            article_data = {
+                "PMC_ID": pmcid,
+                "DOI": doi,
+                "Title": article_title,
+                "Journal": journal_title,
+                "Year": pub_year,
+                "Authors": author_list,
+                **data_sections
+            }
+            
+            return article_data
+            
+        except requests.exceptions.RequestException as e:
+            print(f"[{pmcid}] Request Error (Attempt {attempt + 1}/{max_retries}): {e}")
+        except ET.ParseError:
+            print(f"[{pmcid}] XML Parse Error (Attempt {attempt + 1}/{max_retries}): Malformed XML returned.")
+        except Exception as e:
+            print(f"[{pmcid}] An unexpected error occurred: {e}")
+        
+        if attempt < max_retries - 1:
+            time.sleep(retry_delay * (2 ** attempt)) # Exponential backoff
+        
+    print(f"[{pmcid}] Failed to process article after {max_retries} attempts.")
+    return {"PMC_ID": pmcid, "Error": "Failed to fetch or parse data"}
+
+
+def main():
+    """
+    Main function to orchestrate reading input CSV, fetching data, and writing output CSV.
+    """
+    print(f"Reading article list from {INPUT_CSV_FILENAME}...")
+    articles_to_fetch = []
     
     try:
-        with open(filename, mode='r', newline='', encoding='utf-8') as csvfile:
-            reader = csv.reader(csvfile)
-            
-            # Skip header row
-            try:
-                # Store header, assuming the first row is the header
-                header = next(reader) 
-                if len(header) < 2:
-                    print(f"Warning: CSV header has fewer than two columns. Proceeding assuming header is: {header}")
-            except StopIteration:
-                print(f"Error: CSV file '{filename}' is empty.")
-                return []
-            
-            # Process data rows
-            # We start line counting from 2 (after the header)
-            for i, row in enumerate(reader, 2): 
-                if len(row) < 2:
-                    print(f"Skipping line {i}: Row does not have a URL column (second column).")
-                    continue
-                
-                url = row[1].strip() # URL is consistently in the second column (index 1)
-                pmcid = extract_pmcid_from_url(url)
-                
+        with open(INPUT_CSV_FILENAME, mode='r', newline='', encoding='utf-8') as infile:
+            reader = csv.DictReader(infile)
+            for row in reader:
+                pmcid = get_pmcid_from_url(row['Link'])
                 if pmcid:
-                    pmc_ids.append(pmcid)
+                    articles_to_fetch.append({
+                        "Title_Input": row['Title'],
+                        "Link_Input": row['Link'],
+                        "PMC_ID": pmcid
+                    })
                 else:
-                    # Log the row that failed to parse
-                    print(f"Warning: Could not extract PMC ID from URL on line {i}: {url}")
+                    print(f"Warning: Could not find PMC ID in link: {row['Link']}")
 
-        print(f"Successfully extracted {len(pmc_ids)} valid PMC IDs.")
-        return pmc_ids
-        
     except FileNotFoundError:
-        print(f"Error: Input file '{filename}' not found. Please ensure your CSV is named '{filename}'.")
-        return []
-
-def fetch_and_save_articles(pmc_ids):
-    """Fetches articles in batches and saves the raw XML."""
-    if not pmc_ids:
-        print("No valid PMC IDs found to process.")
+        print(f"Error: Input file '{INPUT_CSV_FILENAME}' not found. Please create it first.")
+        return
+    except Exception as e:
+        print(f"Error reading input CSV: {e}")
         return
 
-    # Ensure output directory exists
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
-        print(f"Created output directory: {OUTPUT_DIR}")
-
-    total_ids = len(pmc_ids)
-    # Calculate number of batches needed
-    num_batches = (total_ids + BATCH_SIZE - 1) // BATCH_SIZE
-    print(f"Total IDs to fetch: {total_ids}. Processing in {num_batches} batches (Size: {BATCH_SIZE}).")
-
-    successful_fetches = 0
+    print(f"Found {len(articles_to_fetch)} PMC IDs to process.")
     
-    for i in range(num_batches):
-        start_index = i * BATCH_SIZE
-        end_index = min(start_index + BATCH_SIZE, total_ids)
-        batch = pmc_ids[start_index:end_index]
-        batch_ids_str = ",".join(batch)
-        
-        print(f"\n--- Starting Batch {i + 1}/{num_batches} (IDs {start_index + 1} to {end_index}) ---")
+    # Prepare header for output CSV
+    output_fieldnames = [
+        "PMC_ID", "DOI", "Title", "Journal", "Year", "Authors", 
+        *TARGET_SECTIONS, 
+        "Title_Input", "Link_Input", "Error"
+    ]
+    
+    processed_data: List[Dict[str, Any]] = []
 
-        # API Parameters
-        params = {
-            "db": DB_NAME,
-            "id": batch_ids_str,
-            "retmode": "xml",     # Retrieve in XML format
-            "rettype": "full",    # Retrieve the full article (including text)
-            "email": USER_EMAIL,  # Required by NCBI for bulk operations
-            "tool": TOOL_NAME     # Required by NCBI for bulk operations
-        }
+    for i, article in enumerate(articles_to_fetch):
+        pmcid = article['PMC_ID']
+        print(f"--- Processing {i + 1}/{len(articles_to_fetch)}: {pmcid} ---")
         
-        # Add API key if provided
-        if API_KEY:
-            params["api_key"] = API_KEY
-            print("Using API key for enhanced rate limit.")
+        # Fetch and parse the data
+        data = fetch_and_parse_article(pmcid)
         
-        # --- Make the API Request ---
-        try:
-            response = requests.get(BASE_URL, params=params, timeout=30)
-            response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
-            
-            # --- Save the Response ---
-            # Save the entire batch response as a single XML file
-            output_filename = os.path.join(OUTPUT_DIR, f"pmc_batch_{i+1:03d}.xml")
-            with open(output_filename, "w", encoding="utf-8") as outfile:
-                outfile.write(response.text)
-            
-            print(f"Successfully saved XML for {len(batch)} articles to: {output_filename}")
-            successful_fetches += len(batch)
-
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching batch {i + 1}: {e}")
-            print("Skipping batch and moving to the next one.")
+        # Add the input data columns
+        data['Title_Input'] = article['Title_Input']
+        data['Link_Input'] = article['Link_Input']
         
-        # --- Rate Limiting Delay ---
-        if i < num_batches - 1:
-            print(f"Waiting {DELAY_SECONDS} seconds before next batch...")
-            time.sleep(DELAY_SECONDS)
+        processed_data.append(data)
+        
+        # Be polite to the API
+        time.sleep(0.5)
 
-    print("\n--- Download Complete ---")
-    print(f"Total successful article records fetched: {successful_fetches}")
-    print(f"Check the '{OUTPUT_DIR}' directory for your XML files.")
+    # --- Write to CSV ---
+    print(f"\nWriting results to {OUTPUT_CSV_FILENAME}...")
+    try:
+        with open(OUTPUT_CSV_FILENAME, 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=output_fieldnames, extrasaction='ignore')
+            writer.writeheader()
+            writer.writerows(processed_data)
 
+        print(f"✅ All data successfully saved to {OUTPUT_CSV_FILENAME}")
+
+    except Exception as e:
+        print(f"An error occurred while writing the CSV file: {e}")
 
 if __name__ == "__main__":
-    # Check for mandatory configuration
-    if USER_EMAIL == "your.email@example.com":
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        print("! ERROR: Please edit pmc_downloader.py and set USER_EMAIL and TOOL_NAME. !")
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    else:
-        # Step 1: Read the IDs
-        pmc_ids = read_pmc_ids(INPUT_FILE)
-        
-        # Step 2: Fetch and save the data
-        fetch_and_save_articles(pmc_ids)
+    main()
