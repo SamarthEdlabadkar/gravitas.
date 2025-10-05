@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import chromadb
+from chromadb.utils import embedding_functions
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -8,6 +10,10 @@ app = Flask(__name__)
 # This is crucial to allow your React frontend (running on a different port)
 # to communicate with this Flask backend.
 CORS(app)
+
+def generate_embeddings(query: str):
+    ollama_embedder = embedding_functions.OllamaEmbeddingFunction(model_name="qwen3-embedding:4b")
+    
 
 # --- API Endpoints ---
 
@@ -20,6 +26,16 @@ def search():
     """
     data = request.get_json() 
     query = data.get('query')
+
+    chroma_client = chromadb.Client()
+    collection = chroma_client.create_collection(name="research_papers")
+    
+    embeddings = generate_embeddings(query=query)
+    
+    collection.query(
+        query_embeddings=
+    )   
+
 
     if not query:
         return jsonify({"error": "Query parameter is required"}), 400
