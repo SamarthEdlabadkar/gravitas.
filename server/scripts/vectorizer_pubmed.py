@@ -21,7 +21,7 @@ with open("server/static/data_pubmed.csv", newline='', encoding="utf-8") as csvf
         DOI = row[1]
         journal = row[3]
         year = row[4]
-        authors = row[2]
+        authors = row[5]
         link = row[14]
 
         print(f"PMC ID: {pmc_id}")

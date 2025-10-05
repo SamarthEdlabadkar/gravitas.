@@ -1,48 +1,21 @@
-# import json
-# import sqlite3
-
-# # Connect to the database (creates it if not exists)
-# conn = sqlite3.connect("server/static/papers.db")
-# cursor = conn.cursor()
-
-# # Example query: select title and classification
-# cursor.execute("SELECT title, classification FROM classifications")
-
-# # Fetch all results
-# rows = cursor.fetchall()
-
-# # Display results
-# for row in rows:
-#     title, classification = row
-#     classification = json.loads(classification)
-    
-
-# # Close connection
-# conn.close()
-
 import chromadb
 from chromadb.utils import embedding_functions
 
-def generate_embeddings(query: str):
-    ollama_embedder = embedding_functions.OllamaEmbeddingFunction(model_name="qwen3-embedding:4b")
-    return ollama_embedder([query])
+doc_id = "PMC3040128"
 
+chroma_client = chromadb.PersistentClient("server/static/chroma")
 
-query = "spaceflight"
+chroma_client.delete_collection("research_papers")
 
-chroma_client = chromadb.PersistentClient(
-    path="server/static/chroma"
-)
-collection = chroma_client.get_collection(name="research_papers")
+# if doc_id[:3] == "PMC":
+#     db = "research_papers"
+# else:
+#     db = "osdr_experiments"
 
-embeddings = generate_embeddings(query=query)
-
-response = collection.query(
-    query_embeddings=embeddings,
-    n_results=15,
-    include=["metadatas", "documents"]
-)
-
-import pprint
-
-pprint.pprint(response)
+# collection = chroma_client.get_collection(name=db)
+# response = collection.query(
+#     query_texts=[embedding_functions.OllamaEmbeddingFunction("qwen3-embedding:4b")],
+#     n_results=1,
+#     include=["metadatas", "documents"],
+#     ids=[f"chunk_{doc_id}"]
+# )
