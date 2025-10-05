@@ -208,6 +208,9 @@ Input Data:
     ) # type:ignore
 
     summary = result.model_dump()['summary']
+    
+    #with open('summaryTest.json','r', encoding='utf-8') as file:
+    #    summary = json.load(file)
 
     return jsonify({"summary": summary})
 

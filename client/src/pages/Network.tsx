@@ -13,7 +13,8 @@ type Publication = {
   journal: string;
   link: string;
   year: number;
-  abstract: string; // Optional field for abstracts
+  abstract: string;
+  categories: string[];
 };
 
 const truncateText = (text: string, wordLimit: number) => {
@@ -44,6 +45,10 @@ const Network = () => {
       pub.categories.includes(selectedCategory)
     );
   }, [selectedCategory, publications]);
+
+  const handlePublicationClick = (publication: Publication) => {
+    navigate("/knowledgegraph", { state: { publication } });
+  };
   
   return (
     <div className="min-h-screen w-full p-6">
@@ -95,21 +100,29 @@ const Network = () => {
                   <div
                     key={pub.pmc_id}
                     className="p-4 bg-background/50 border border-border/50 rounded-lg hover:border-primary/50 transition-all duration-200 hover:shadow-lg group"
+                    onClick={() => handlePublicationClick(pub)}
                   >
-                    <a href={pub.link || `https://www.ncbi.nlm.nih.gov/pmc/articles/${pub.pmc_id}`} target="_blank" rel="noopener noreferrer">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                            <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
                             {pub.title}
-                            </h3>
-                            <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+                        </h3>
+                        {/* Wrap the icon in its own link to preserve external navigation */}
+                        <a 
+                            href={pub.link || `https://www.ncbi.nlm.nih.gov/pmc/articles/${pub.pmc_id}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()} // Stop the parent div's onClick from firing
+                            className="flex-shrink-0"
+                        >
+                            <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                        </a>
                         </div>
                         <p className="text-sm text-muted-foreground mb-2">
-                          {truncateText(pub.authors,10)} • {pub.year}
+                        {truncateText(pub.authors,10)} • {pub.year}
                         </p>
                         <p className="text-sm text-muted-foreground/80 leading-relaxed">
-                          {truncateText(pub.abstract, 20)}
+                        {truncateText(pub.abstract, 20)}
                         </p>
-                    </a>
                   </div>
                 ))}
               </div>
