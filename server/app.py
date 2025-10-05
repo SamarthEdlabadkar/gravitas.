@@ -23,9 +23,9 @@ load_dotenv()
 CORS(app)
 
 class GeneratedSummary(BaseModel):
-    summary: List[str] = Field(
+    summary: str = Field(
         ...,
-        description="A list of five sentences describing the entire information"
+        description="Five sentences describing the entire information"
     )
 
 def generate_embeddings(query: str):
@@ -118,6 +118,7 @@ def get_summary():
         return jsonify({"error": "Context for summary is required"}), 400
     
     chroma_client = chromadb.PersistentClient("server/static/chroma")
+    ollama_embedder = embedding_functions.OllamaEmbeddingFunction(model_name="qwen3-embedding:4b")
 
     if doc_id[:3] == "PMC":
         db = "research_papers"
@@ -126,11 +127,13 @@ def get_summary():
 
     collection = chroma_client.get_collection(name=db)
     response = collection.query(
-        query_texts=[""],
+        query_embeddings=ollama_embedder(["query"]),
         n_results=1,
         include=["metadatas", "documents"],
         ids=[f"chunk_{doc_id}"]
     )
+
+    print(response)
 
     api_key = os.getenv("GROQ_API_KEY")
     client = Groq(api_key=api_key)
@@ -148,17 +151,17 @@ Structure & Content Requirements:
 
 Tone and Style: The summary must be objective, formal, and strictly academic. Do not use conversational language or qualifiers unless absolutely necessary. 
 
-Constraint: The total length of the summary must not exceed 5 bullet points in the order of the above mentioned sections. Prioritize clarity and density of information over verbose explanation.
+The summary should be 5 sentences in length.
 
 Input Data:
     """
 
     result = client.chat.completions.create(
-        model='llama-3.3-70b-versatile',  # currently working - llama-3.3-70b-versatile, llama3-8b-8192
+        model='llama-3.1-8b-instant',  # currently working - llama-3.3-70b-versatile, llama3-8b-8192
         messages=[
             {
                 "role": "user",
-                "content": prompt + "" + "\n\n Query: query"
+                "content": prompt + str(response["documents"][0][0]) + "\n\n Query: query" # type:ignore
             }
         ],
         temperature=0.2,
