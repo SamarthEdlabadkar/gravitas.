@@ -160,7 +160,7 @@ const RadialNetworkGraph = () => {
                   cx={node.x}
                   cy={node.y}
                   r={node.isRoot ? rootNodeRadius : nodeRadius}
-                  fill={node.isRoot ? '#0a0a0a' : (hoveredNode === node.id ? '#0a0a0a' : 'none')} // Set root node background to black
+                  fill={node.isRoot ? '#0a0a0a' : (hoveredNode === node.id ? '#FFFFFF' : 'none')} // Set root node background to black
                   fillOpacity="0.9"
                   stroke={'#FFFFFF'}
                   strokeWidth={node.isRoot ? 1 : 1.5}
