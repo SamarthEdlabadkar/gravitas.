@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import HeroBg from "@/assets/hero-bg.jpg";
 
 // --- Type Definitions for nodes ---
@@ -29,13 +29,32 @@ type NodeType = RootNodeType | ChildNodeType;
 const RadialNetworkGraph = () => {
   // --- Component State & Configuration ---
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [dimensions, setDimensions] = useState({ width: 700, height: 700 });
 
-  // Graph dimensions and properties, adjusted for new design
-  const width = 700;
-  const height = 700;
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setDimensions({ width, height });
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(handleResize);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  const { width, height } = dimensions;
   const centerX = width / 2;
   const centerY = height / 2;
-  const radius = 225;
+  const radius = Math.min(width, height) / 3;
   const nodeRadius = 12; // Made child nodes smaller
   const rootNodeRadius = 70; // Made root node much bigger
 
@@ -90,14 +109,18 @@ const RadialNetworkGraph = () => {
 
   // --- Rendering ---
   return (
-    <div className="bg-background/50 rounded-2xl shadow-2xl overflow-hidden border border-gray-700"
-        style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-        }}
+    <div
+      ref={containerRef}
+      className="bg-background/50 rounded-2xl shadow-2xl overflow-hidden border border-gray-700"
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
+      }}
     >
-      <svg viewBox={`0 0 ${width} ${height}`} width="78%" height="100%">
+      <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%">
         {/* Defs for image pattern and filters */}
         <defs>
           <pattern
