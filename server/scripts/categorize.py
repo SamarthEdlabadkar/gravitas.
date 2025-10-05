@@ -134,7 +134,7 @@ def read_columns(csv_file, col3_index=2, col7_index=6):
 
 # Example usage
 if __name__ == "__main__":
-    data = read_columns("server/static/extracted_article_data.csv")
+    data = read_columns("server/static/data_pubmed.csv")
     init_db()
 
     for idx, (title, abstract) in enumerate(data[406:]):
