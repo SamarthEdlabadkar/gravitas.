@@ -15,12 +15,11 @@ type Publication = {
   authors: string;
   journal: string;
   link: string;
-  year: number | string; // Year can be a string from the API
+  year: number | string;
   abstract: string;
-  categories?: string[]; // Make categories optional
+  categories?: string[];
 };
 
-// Represents a related publication for child nodes
 type KGNode = {
     pmc_id: string;
     title: string;
@@ -29,32 +28,43 @@ type KGNode = {
 const KnowledgeGraph = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const publication: Publication | null = location.state?.publication || null;
 
-  // --- State for fetched data ---
+  // --- Get initial data from location state ---
+  const initialPublication: Publication | null = location.state?.publication || null;
+  const searchQuery: string | null = location.state?.query || null; // Get the original search query
+
+  // --- State Management for Dynamic Updates ---
+  const [currentPublication, setCurrentPublication] = useState<Publication | null>(initialPublication);
   const [summaryData, setSummaryData] = useState<Publication | null>(null);
   const [childNodes, setChildNodes] = useState<KGNode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userPath, setUserPath] = useState<Publication[]>([]);
+  const [userPath, setUserPath] = useState<Publication[]>(initialPublication ? [initialPublication] : []);
 
   // --- API Fetching Logic ---
   useEffect(() => {
-    if (!publication) {
+    if (!currentPublication || !searchQuery) {
       setIsLoading(false);
-      setError("No publication data found. Please return to the previous page and select a publication.");
+      setError("No publication data or search query found. Please return to the previous page.");
       return;
     }
-
-    setUserPath([publication]);
 
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
       try {
+        // --- MODIFIED FETCH CALL ---
+        // The summary call is now a POST request sending both the query and the current publication's ID.
         const [summaryRes, kgNodeRes] = await Promise.all([
-          fetch(`/api/summary?pmc_id=${publication.pmc_id}`),
-          fetch(`/api/kg_node/${publication.pmc_id}`)
+          fetch(`/api/summary`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              query: searchQuery, 
+              pmc_id: currentPublication.pmc_id 
+            }),
+          }),
+          fetch(`/api/kg_node/${currentPublication.pmc_id}`)
         ]);
 
         if (!summaryRes.ok || !kgNodeRes.ok) {
@@ -68,7 +78,6 @@ const KnowledgeGraph = () => {
         if (Array.isArray(rawSummary) && rawSummary.length === 2) {
             const [summaryText, summaryMeta] = rawSummary;
             
-            // Helper to extract abstract from the combined string
             const parseAbstract = (text: string) => {
                 if (text.includes('Abstract:')) return text.split('Abstract:')[1]?.trim() || '';
                 if (text.includes('Description:')) return text.split('Description:')[1]?.trim() || '';
@@ -76,7 +85,7 @@ const KnowledgeGraph = () => {
             };
 
             const formattedSummary: Publication = {
-                pmc_id: summaryMeta.pmc_id || publication.pmc_id,
+                pmc_id: summaryMeta.pmc_id || currentPublication.pmc_id,
                 title: summaryMeta.title,
                 authors: summaryMeta.authors,
                 journal: summaryMeta.journal || 'N/A',
@@ -92,12 +101,12 @@ const KnowledgeGraph = () => {
         // --- PARSE KG_NODE RESPONSE ---
         if (Array.isArray(rawKgNodes)) {
             const formattedChildNodes = rawKgNodes.map(node => {
-                const meta = node[1]; // The metadata object is the second element
+                const meta = node[1];
                 return {
                     pmc_id: meta.pmc_id || meta.osd_id,
                     title: meta.title
                 };
-            }).filter(node => node.pmc_id && node.title); // Filter out any malformed nodes
+            }).filter(node => node.pmc_id && node.title);
             setChildNodes(formattedChildNodes);
         } else {
              throw new Error('Unexpected kg_node API response format');
@@ -111,9 +120,28 @@ const KnowledgeGraph = () => {
     };
 
     fetchData();
-  }, [publication]);
+  }, [currentPublication, searchQuery]); // Re-run effect when the current publication changes
 
-  const rootNodeForGraph = publication ? { id: publication.pmc_id, label: publication.title } : null;
+  // --- Node Click Handler for Interactivity ---
+  const handleNodeClick = (nodeId: string) => {
+    // Find the full node data from the childNodes state
+    const clickedNode = childNodes.find(node => node.pmc_id === nodeId);
+    // Prevent re-fetching if the same node is clicked
+    if (clickedNode && clickedNode.pmc_id !== currentPublication?.pmc_id) {
+        // Create a partial publication object for the new node
+        const newPublication: Publication = {
+            pmc_id: clickedNode.pmc_id,
+            title: clickedNode.title,
+            authors: '', journal: '', link: '', year: '', abstract: '' // Blank data to be filled by fetch
+        };
+        // Set it as the new current publication, which triggers the useEffect
+        setCurrentPublication(newPublication);
+        // Add the new publication to the user's exploration path
+        setUserPath(prevPath => [...prevPath, newPublication]);
+    }
+  };
+
+  const rootNodeForGraph = currentPublication ? { id: currentPublication.pmc_id, label: currentPublication.title } : null;
 
   return (
     <div className="min-h-screen w-full p-6">
@@ -132,8 +160,12 @@ const KnowledgeGraph = () => {
           <CardHeader>
             <CardTitle className="text-xl font-semibold">Exploration Path</CardTitle>
           </CardHeader>
-          <CardContent>
-             {userPath.map(p => <Badge key={p.pmc_id} className="whitespace-normal text-left">{p.title}</Badge>)}
+          <CardContent className="flex flex-col gap-2">
+             {userPath.map((p, index) => (
+                <Badge key={`${p.pmc_id}-${index}`} variant={index === userPath.length - 1 ? "default" : "secondary"} className="whitespace-normal text-left h-auto">
+                    {p.title}
+                </Badge>
+            ))}
           </CardContent>
         </Card>
 
@@ -146,7 +178,7 @@ const KnowledgeGraph = () => {
               <DynamicGraph
                 rootNode={rootNodeForGraph}
                 childNodes={childNodes.map(node => ({ id: node.pmc_id, label: node.title }))}
-                onNodeClick={(label) => console.log(label)} // Placeholder for node click
+                onNodeClick={handleNodeClick} // Updated to use the new handler
               />
             )}
           </CardContent>
@@ -157,7 +189,7 @@ const KnowledgeGraph = () => {
           <CardHeader>
             <CardTitle className="text-2xl font-semibold">Publication Summary</CardTitle>
             <CardDescription>
-              Details for: <span className="font-semibold text-primary">{publication?.title || "..."}</span>
+              Details for: <span className="font-semibold text-primary">{currentPublication?.title || "..."}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="h-[calc(100%-100px)]">
@@ -170,7 +202,7 @@ const KnowledgeGraph = () => {
                     <Skeleton className="h-4 w-1/2" />
                 </div>
               )}
-              {error && <p className="text-destructive">{error}</p>}
+              {error && !isLoading && <p className="text-destructive">Could not load summary for this publication.</p>}
               {!isLoading && !error && summaryData && (
                 <div className="space-y-6 text-sm">
                   <div>
