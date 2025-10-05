@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
+import RadialNetworkGraph from "@/components/D3Graph";
 
 const Network = () => {
   const navigate = useNavigate();
@@ -72,7 +73,10 @@ const Network = () => {
         {/* Left Section - Knowledge Graph */}
         <Card className="bg-card/50 backdrop-blur-sm border-border/50 h-[calc(100vh-140px)]">
           
+          
           <CardContent className="h-[calc(100%)]">
+            <RadialNetworkGraph />
+            {/* 
             <div className="w-full h-full bg-muted/20 rounded-lg border border-border/50 flex items-center justify-center">
               <div className="text-center space-y-2">
                 <div className="w-24 h-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
@@ -83,7 +87,7 @@ const Network = () => {
                 <p className="text-muted-foreground text-lg">Radial Tree Visualization</p>
                 <p className="text-muted-foreground/60 text-sm">Graph rendering placeholder</p>
               </div>
-            </div>
+            </div>*/}
           </CardContent>
         </Card>
 
