@@ -66,7 +66,7 @@ const WrappedText = ({ label, x, y, textAnchor, style }) => {
 
 
 // The core component for rendering the radial graph
-const RadialNetworkGraph = () => {
+const RadialNetworkGraph = ({onNodeClick}) => {
   // --- Component State & Configuration ---
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [dimensions, setDimensions] = useState({ width: 700, height: 700 });
@@ -208,6 +208,8 @@ const RadialNetworkGraph = () => {
               key={node.id}
               onMouseEnter={() => setHoveredNode(node.id)}
               onMouseLeave={() => setHoveredNode(null)}
+              className="cursor-pointer"
+              onClick={() => onNodeClick(node.isRoot? null : node.label)}
             >
               <g>
                 <circle
