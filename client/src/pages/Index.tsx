@@ -9,11 +9,43 @@ import demoPreview from "@/assets/demo-preview.jpg";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
   const navigate = useNavigate();
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      navigate("/network")
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return; // Don't search if the query is empty
+
+    setIsLoading(true);
+    setError(null);
+    setResults([]); // Clear previous results
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: searchQuery }), // Send the searchQuery state
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      setResults(data);
+      
+      // Navigate after successful search, passing results and query via state
+      navigate("/network", { state: { results: data, query: searchQuery } });
+
+    } catch (err: any) {
+      setError(err.message);
+      // Decide if you want to navigate or show an error on the current page
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -40,7 +72,7 @@ const Index = () => {
         <div className="relative w-full max-w-4xl space-y-8 animate-fade-in">
           <div className="text-center space-y-4">
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-              Med-O-Search
+              Gravitas.
             </h1>
             <p className="text-muted-foreground text-xl md:text-2xl font-light max-w-2xl mx-auto">
               Discover and explore scientific literature with advanced AI-powered search
@@ -71,7 +103,7 @@ const Index = () => {
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-primary/60" />
-              2K+ Research Papers
+              1K+ Research Papers
             </span>
             <span className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-primary/60" />
