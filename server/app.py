@@ -1,11 +1,19 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import chromadb
 from chromadb.utils import embedding_functions
 
+from dotenv import load_dotenv
+from groq import Groq
+import instructor
+
+import sqlite3
+import json
+
 # Initialize the Flask application
 app = Flask(__name__)
-
+load_dotenv()
 # Enable Cross-Origin Resource Sharing (CORS)
 # This is crucial to allow your React frontend (running on a different port)
 # to communicate with this Flask backend.
@@ -30,42 +38,39 @@ def search():
     if not query:
         return jsonify({"error": "Query parameter is required"}), 400
 
-    chroma_client = chromadb.Client()
+    chroma_client = chromadb.PersistentClient("server/static/chroma")
     collection = chroma_client.get_collection(name="research_papers")
     
     embeddings = generate_embeddings(query=query)
     
     response = collection.query(
         query_embeddings=embeddings,
-        n_results=15,
-        include=["metadatas", "distances"]
+        n_results=25,
+        include=["metadatas", "documents"]
     )
 
-    print(response.items())
+    # Connect to the database (creates it if not exists)
+    conn = sqlite3.connect("server/static/papers.db")
+    cursor = conn.cursor()
 
-    # Mock response for demonstration
-    mock_graph_data = {
-        "nodes": [
-            {"id": "center_node", "label": query, "type": "query"},
-            {"id": "node_1", "label": "Human Physiology", "type": "topic"},
-            {"id": "node_2", "label": "Microgravity Effects", "type": "topic"},
-            {"id": "node_3", "label": "Cardiovascular System", "type": "sub_topic"},
-        ],
-        "links": [
-            {"source": "center_node", "target": "node_1"},
-            {"source": "center_node", "target": "node_2"},
-            {"source": "node_2", "target": "node_3"},
-        ]
-    }
-    mock_publications = [
-        {"id": "pub_001", "title": "The Heart in Space", "authors": "J. Doe"},
-        {"id": "pub_002", "title": "Bone Density Loss in Astronauts", "authors": "A. Smith"},
-    ]
+    # Fetch all results
+    rows = cursor.fetchall()
 
-    return jsonify({
-        "graphData": mock_graph_data,
-        "publications": mock_publications
-    })
+    # Display results
+    for row in rows:
+        title, classification = row
+        classification = json.loads(classification)
+
+    data = []
+
+    for idx in range(len(response["documents"][0])): #type: ignore
+        cursor.execute(f"SELECT title, classification FROM classifications WHERE TITLE = '{response["metadatas"][0][idx]["title"]}'") #type:ignore
+        row = cursor.fetchone()
+        classifications = json.loads(row[1])
+        data.append((response["documents"][0][idx], response["metadatas"][0][idx], classifications)) #type: ignore
+
+    return jsonify(data)
+
 
 @app.route('/kg_node/<node_id>', methods=['GET'])
 def get_node_details(node_id):
@@ -96,9 +101,14 @@ def get_summary():
     This would be the place to call a language model (LLM).
     """
     data = request.get_json()
-    context = data.get('context') # Could be a node_id, a list of nodes, etc.
+    doc_id = data.get("id") # Could be a node_id, a list of nodes, etc.
 
-    if not context:
+    api_key = os.getenv("GROQ_API_KEY")
+    client = Groq(api_key=api_key)
+    client = instructor.from_groq(client, mode=instructor.Mode.JSON)
+
+
+    if not doc_id:
         return jsonify({"error": "Context for summary is required"}), 400
 
     # --- In a real application ---
@@ -106,10 +116,9 @@ def get_summary():
     # 2. Format a prompt for your LLM.
     # 3. Return the generated summary from the LLM.
 
-    # Mock response for demonstration
-    mock_summary = f"This is a generated summary about '{context}'. Research indicates a significant correlation between prolonged spaceflight and changes in the cardiovascular system. Key factors include fluid shifts and lack of gravitational load."
+    
 
-    return jsonify({"summary": mock_summary})
+    return jsonify({"summary": ""})
 
 @app.route('/status', methods=['GET'])
 def status():
