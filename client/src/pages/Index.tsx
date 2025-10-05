@@ -4,46 +4,66 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import nebulaBg from "@/assets/carinanebula3-bg.jpg"
+import nebulaBg from "@/assets/carinanebula3-bg.jpg";
 import demoPreview from "@/assets/demo-preview.jpg";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  // This state is not strictly necessary anymore since we navigate immediately,
+  // but it's good practice to keep it for potential future use (e.g., showing results on the same page).
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const navigate = useNavigate();
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) return; // Don't search if the query is empty
+    if (!searchQuery.trim()) return;
 
     setIsLoading(true);
     setError(null);
-    setResults([]); // Clear previous results
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/search', {
+      const response = await fetch('http://127.0.0.1:5000/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: searchQuery }), // Send the searchQuery state
+        body: JSON.stringify({ query: searchQuery }),
       });
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
 
-      const data = await response.json();
-      setResults(data);
+      const rawData = await response.json();
+
+      // **1. Process the complex API response into a clean array of objects**
+      const processedResults = rawData.map((item: any) => {
+        const abstractText = item[0]?.split('Abstract: ')[1] || "No abstract available.";
+        const metadata = item[1];
+        const categories = item[2];
+
+        return {
+          // Combine all data into a single, easy-to-use object
+          abstract: abstractText,
+          pmc_id: metadata.pmc_id,
+          title: metadata.title,
+          authors: metadata.authors,
+          year: metadata.year,
+          journal: metadata.journal,
+          link: metadata.link,
+          categories: categories || [], // Ensure categories is always an array
+        };
+      });
       
-      // Navigate after successful search, passing results and query via state
-      navigate("/network", { state: { results: data, query: searchQuery } });
+      setResults(processedResults);
+
+      // **2. Navigate with the newly processed, clean data**
+      navigate("/network", { state: { results: processedResults, query: searchQuery } });
 
     } catch (err: any) {
       setError(err.message);
-      // Decide if you want to navigate or show an error on the current page
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +77,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen w-full relative z-0 ">
-    <div
+      <div
         className="absolute inset-0 w-full h-full opacity-25 -z-10"
         style={{
           backgroundImage: `url(${nebulaBg})`,
@@ -88,17 +108,21 @@ const Index = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleKeyPress}
+                disabled={isLoading} // Disable input while loading
                 className="pl-12 h-16 text-lg bg-card/80 backdrop-blur-sm border-border/50 focus:border-primary transition-all duration-200 rounded-xl shadow-lg"
               />
             </div>
             <Button
               onClick={handleSearch}
+              disabled={isLoading} // Disable button while loading
               size="lg"
               className="cursor-pointer h-16 px-10 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all duration-200 hover:shadow-[var(--shadow-glow)] rounded-xl text-lg"
             >
-              Search
+              {isLoading ? 'Searching...' : 'Search'}
             </Button>
           </div>
+           {error && <p className="text-center text-destructive">{error}</p>}
+
 
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">

@@ -47,6 +47,7 @@ def search():
     if not query:
         return jsonify({"error": "Query parameter is required"}), 400
 
+    """
     chroma_client = chromadb.PersistentClient("server/static/chroma")
     collection = chroma_client.get_collection(name="research_papers")
     
@@ -70,13 +71,15 @@ def search():
         title, classification = row
         classification = json.loads(classification)
 
-    data = []
-
     for idx in range(len(response["documents"][0])): #type: ignore
         cursor.execute(f"SELECT title, classification FROM classifications WHERE TITLE = '{response["metadatas"][0][idx]["title"]}'") #type:ignore
         row = cursor.fetchone()
         classifications = json.loads(row[1])
         data.append((response["documents"][0][idx], response["metadatas"][0][idx], classifications)) #type: ignore
+    """
+
+    with open('searchTest.json','r', encoding='utf-8') as file:
+        data = json.load(file)
 
     return jsonify(data)
 
