@@ -82,43 +82,43 @@ const KnowledgeGraph = () => {
         console.log(rawKgNodes);
 
         // --- PARSE KG_NODE RESPONSE ---
-        const nodesArray = rawKgNodes.data; 
+        const nodesArray = rawKgNodes.data;
 
-// 2. Check if the 'data' property holds the expected array structure
-if (Array.isArray(nodesArray)) {
-    const rootPmcId = currentPublication.pmc_id;
-    
-    const formattedChildNodes = nodesArray
-        .map((node: any) => { // Use 'any' here for flexibility with the array structure
-            // Check if the node is an array of length 2 and the second element is an object
-            if (Array.isArray(node) && node.length > 1 && typeof node[1] === 'object' && node[1] !== null) {
+        // 2. Check if the 'data' property holds the expected array structure
+        if (Array.isArray(nodesArray)) {
+          const rootPmcId = currentPublication.pmc_id;
+
+          const formattedChildNodes = nodesArray
+            .map((node: any) => { // Use 'any' here for flexibility with the array structure
+              // Check if the node is an array of length 2 and the second element is an object
+              if (Array.isArray(node) && node.length > 1 && typeof node[1] === 'object' && node[1] !== null) {
                 const meta = node[1];
-                
+
                 // Use pmc_id or osd_id and ensure it's a string
                 const id = String(meta.pmc_id || meta.osd_id);
-                
+
                 return {
-                    pmc_id: id,
-                    title: meta.title
+                  pmc_id: id,
+                  title: meta.title
                 };
-            }
-            // Return null for invalid formats
-            return null;
-        })
-        .filter(node => node !== null) // Remove invalid entries
-        // Filter out the root node itself and ensure ID/Title exist
-        .filter(node => 
-            node.pmc_id && 
-            node.title && 
-            node.pmc_id !== rootPmcId
-        );
+              }
+              // Return null for invalid formats
+              return null;
+            })
+            .filter(node => node !== null) // Remove invalid entries
+            // Filter out the root node itself and ensure ID/Title exist
+            .filter(node =>
+              node.pmc_id &&
+              node.title &&
+              node.pmc_id !== rootPmcId
+            );
 
-    setChildNodes(formattedChildNodes as KGNode[]); 
+          setChildNodes(formattedChildNodes as KGNode[]);
 
-} else {
-    // This will now only throw if the 'data' key is missing or is not an array
-    throw new Error('Unexpected kg_node API response format: "data" property is missing or is not an array.');
-}
+        } else {
+          // This will now only throw if the 'data' key is missing or is not an array
+          throw new Error('Unexpected kg_node API response format: "data" property is missing or is not an array.');
+        }
 
       } catch (err: any) {
         setError(err.message);
@@ -161,12 +161,12 @@ if (Array.isArray(nodesArray)) {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1800px] mx-auto grid grid-cols-[15%_55%_30%] gap-6 h-[calc(100vh-140px)]">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-[13%_57%_25%] gap-6 h-[calc(100vh-140px)]">
 
         {/* Left Column - User Path */}
         <Card className="bg-card/50 backdrop-blur-sm border-border/50">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">Exploration Path</CardTitle>
+            <CardTitle className="text-lg font-semibold">Exploration Path</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             {userPath.map((p, index) => (
@@ -179,13 +179,13 @@ if (Array.isArray(nodesArray)) {
 
         {/* Center Column - Knowledge Graph */}
         <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardContent className="h-full pt-6">
+          <CardContent className="h-[80%] pt-6">
             {isLoading && <div className="w-full h-full bg-muted/20 rounded-lg flex items-center justify-center"><p>Loading Graph...</p></div>}
             {error && <div className="w-full h-full bg-destructive/20 rounded-lg flex items-center justify-center p-4"><p className="text-destructive-foreground text-center">{error}</p></div>}
             {!isLoading && !error && rootNodeForGraph && (
               <DynamicGraph
                 rootNode={rootNodeForGraph}
-                childNodes={childNodes.map(node => ({ id: node.pmc_id, label: node.title }))}
+                childNodes={childNodes.map(node => ({ id: node.pmc_id, label: node.title.slice(0, 55) + "..." }))}
                 onNodeClick={handleNodeClick} // Updated to use the new handler
               />
             )}
@@ -195,14 +195,14 @@ if (Array.isArray(nodesArray)) {
         {/* Right Column - Summary Panel */}
         <Card className="bg-card/50 backdrop-blur-sm border-border/50">
           <CardHeader>
-            <CardTitle className="text-2xl font-semibold">Publication Summary</CardTitle>
+            <CardTitle className="text-xl font-semibold">Publication Summary</CardTitle>
             <CardDescription>
               Details for: <span className="font-semibold text-primary">{currentPublication?.title || "..."}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="h-[calc(100%-100px)]">
             <ScrollArea className="h-full pr-4">
-              <p>{summaryData}</p>
+              <p className="text-sm">{summaryData}</p>
 
             </ScrollArea>
           </CardContent>
