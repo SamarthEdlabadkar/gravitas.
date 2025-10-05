@@ -21,8 +21,8 @@ type Publication = {
 };
 
 type KGNode = {
-    pmc_id: string;
-    title: string;
+  pmc_id: string;
+  title: string;
 }
 
 const KnowledgeGraph = () => {
@@ -56,61 +56,69 @@ const KnowledgeGraph = () => {
         // --- MODIFIED FETCH CALL ---
         // The summary call is now a POST request sending both the query and the current publication's ID.
         const [summaryRes, kgNodeRes] = await Promise.all([
-          fetch(`/api/summary`, {
+          fetch(`http://127.0.0.1:5000/summary`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              query: searchQuery, 
-              pmc_id: currentPublication.pmc_id 
+            body: JSON.stringify({
+              query: searchQuery,
+              id: currentPublication.pmc_id
             }),
           }),
-          fetch(`/api/kg_node/${currentPublication.pmc_id}`)
+          fetch(`http://127.0.0.1:5000/kg_node/${currentPublication.pmc_id}`)
         ]);
+        console.log(summaryRes);
+        console.log(kgNodeRes);
 
         if (!summaryRes.ok || !kgNodeRes.ok) {
           throw new Error('Failed to fetch data from the server.');
         }
 
-        const rawSummary = await summaryRes.json();
+        const rawSummary = await summaryRes.json().then((val) => {
+          let summary = val.summary;
+          setSummaryData(summary);
+        });
+
         const rawKgNodes = await kgNodeRes.json();
-
-        // --- PARSE SUMMARY RESPONSE ---
-        if (Array.isArray(rawSummary) && rawSummary.length === 2) {
-            const [summaryText, summaryMeta] = rawSummary;
-            
-            const parseAbstract = (text: string) => {
-                if (text.includes('Abstract:')) return text.split('Abstract:')[1]?.trim() || '';
-                if (text.includes('Description:')) return text.split('Description:')[1]?.trim() || '';
-                return text;
-            };
-
-            const formattedSummary: Publication = {
-                pmc_id: summaryMeta.pmc_id || currentPublication.pmc_id,
-                title: summaryMeta.title,
-                authors: summaryMeta.authors,
-                journal: summaryMeta.journal || 'N/A',
-                link: summaryMeta.link,
-                year: summaryMeta.year || 'N/A',
-                abstract: parseAbstract(summaryText),
-            };
-            setSummaryData(formattedSummary);
-        } else {
-            throw new Error('Unexpected summary API response format');
-        }
+        console.log(rawKgNodes);
 
         // --- PARSE KG_NODE RESPONSE ---
-        if (Array.isArray(rawKgNodes)) {
-            const formattedChildNodes = rawKgNodes.map(node => {
+        const nodesArray = rawKgNodes.data; 
+
+// 2. Check if the 'data' property holds the expected array structure
+if (Array.isArray(nodesArray)) {
+    const rootPmcId = currentPublication.pmc_id;
+    
+    const formattedChildNodes = nodesArray
+        .map((node: any) => { // Use 'any' here for flexibility with the array structure
+            // Check if the node is an array of length 2 and the second element is an object
+            if (Array.isArray(node) && node.length > 1 && typeof node[1] === 'object' && node[1] !== null) {
                 const meta = node[1];
+                
+                // Use pmc_id or osd_id and ensure it's a string
+                const id = String(meta.pmc_id || meta.osd_id);
+                
                 return {
-                    pmc_id: meta.pmc_id || meta.osd_id,
+                    pmc_id: id,
                     title: meta.title
                 };
-            }).filter(node => node.pmc_id && node.title);
-            setChildNodes(formattedChildNodes);
-        } else {
-             throw new Error('Unexpected kg_node API response format');
-        }
+            }
+            // Return null for invalid formats
+            return null;
+        })
+        .filter(node => node !== null) // Remove invalid entries
+        // Filter out the root node itself and ensure ID/Title exist
+        .filter(node => 
+            node.pmc_id && 
+            node.title && 
+            node.pmc_id !== rootPmcId
+        );
+
+    setChildNodes(formattedChildNodes as KGNode[]); 
+
+} else {
+    // This will now only throw if the 'data' key is missing or is not an array
+    throw new Error('Unexpected kg_node API response format: "data" property is missing or is not an array.');
+}
 
       } catch (err: any) {
         setError(err.message);
@@ -128,16 +136,16 @@ const KnowledgeGraph = () => {
     const clickedNode = childNodes.find(node => node.pmc_id === nodeId);
     // Prevent re-fetching if the same node is clicked
     if (clickedNode && clickedNode.pmc_id !== currentPublication?.pmc_id) {
-        // Create a partial publication object for the new node
-        const newPublication: Publication = {
-            pmc_id: clickedNode.pmc_id,
-            title: clickedNode.title,
-            authors: '', journal: '', link: '', year: '', abstract: '' // Blank data to be filled by fetch
-        };
-        // Set it as the new current publication, which triggers the useEffect
-        setCurrentPublication(newPublication);
-        // Add the new publication to the user's exploration path
-        setUserPath(prevPath => [...prevPath, newPublication]);
+      // Create a partial publication object for the new node
+      const newPublication: Publication = {
+        pmc_id: clickedNode.pmc_id,
+        title: clickedNode.title,
+        authors: '', journal: '', link: '', year: '', abstract: '' // Blank data to be filled by fetch
+      };
+      // Set it as the new current publication, which triggers the useEffect
+      setCurrentPublication(newPublication);
+      // Add the new publication to the user's exploration path
+      setUserPath(prevPath => [...prevPath, newPublication]);
     }
   };
 
@@ -154,17 +162,17 @@ const KnowledgeGraph = () => {
 
       {/* Main Content */}
       <div className="max-w-[1800px] mx-auto grid grid-cols-[15%_55%_30%] gap-6 h-[calc(100vh-140px)]">
-        
+
         {/* Left Column - User Path */}
         <Card className="bg-card/50 backdrop-blur-sm border-border/50">
           <CardHeader>
             <CardTitle className="text-xl font-semibold">Exploration Path</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
-             {userPath.map((p, index) => (
-                <Badge key={`${p.pmc_id}-${index}`} variant={index === userPath.length - 1 ? "default" : "secondary"} className="whitespace-normal text-left h-auto">
-                    {p.title}
-                </Badge>
+            {userPath.map((p, index) => (
+              <Badge key={`${p.pmc_id}-${index}`} variant={index === userPath.length - 1 ? "default" : "secondary"} className="whitespace-normal text-left h-auto">
+                {p.title}
+              </Badge>
             ))}
           </CardContent>
         </Card>
@@ -194,31 +202,8 @@ const KnowledgeGraph = () => {
           </CardHeader>
           <CardContent className="h-[calc(100%-100px)]">
             <ScrollArea className="h-full pr-4">
-              {isLoading && (
-                <div className="space-y-4">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-1/2" />
-                </div>
-              )}
-              {error && !isLoading && <p className="text-destructive">Could not load summary for this publication.</p>}
-              {!isLoading && !error && summaryData && (
-                <div className="space-y-6 text-sm">
-                  <div>
-                    <h3 className="font-semibold text-base mb-2 text-foreground">Abstract</h3>
-                    <p className="text-muted-foreground leading-relaxed">{summaryData.abstract}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-base mb-2 text-foreground">Details</h3>
-                    <div className="space-y-1 text-muted-foreground">
-                      <p><strong>Authors:</strong> {summaryData.authors}</p>
-                      <p><strong>Journal:</strong> {summaryData.journal}</p>
-                      <p><strong>Year:</strong> {summaryData.year}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <p>{summaryData}</p>
+
             </ScrollArea>
           </CardContent>
         </Card>

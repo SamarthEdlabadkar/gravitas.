@@ -138,7 +138,7 @@ def get_node_details(doc_id: str):
         data.append((response_oe["documents"][0][idx], response_oe["metadatas"][0][idx])) #type: ignore
     
 
-    return jsonify(data)
+    return jsonify({"data": data})
 
 
 @app.route('/summary', methods=['POST'])

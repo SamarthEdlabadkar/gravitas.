@@ -40,6 +40,8 @@ const Network = () => {
     if (!selectedCategory) {
       return publications;
     }
+
+    
     // Otherwise, only show publications that include the selected category
     return publications.filter(pub =>
       pub.categories.includes(selectedCategory)
@@ -47,15 +49,15 @@ const Network = () => {
   }, [selectedCategory, publications]);
 
   const handlePublicationClick = (publication: Publication) => {
-    navigate("/knowledgegraph", { state: { publication } });
+    navigate("/knowledgegraph", { state: { publication, query } });
   };
-  
+
   return (
     <div className="min-h-screen w-full p-6">
       {/* Header with Back Button */}
       <div className="max-w-[1600px] mx-auto mb-6">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={() => navigate("/")}
           className="gap-2 hover:bg-card/50"
         >
@@ -69,7 +71,7 @@ const Network = () => {
         {/* Left Section - Knowledge Graph */}
         <Card className="bg-card/50 backdrop-blur-sm border-border/50 h-[calc(100vh-140px)]">
           <CardContent className="h-[calc(100%)]">
-            <RadialNetworkGraph onNodeClick={setSelectedCategory}/>
+            <RadialNetworkGraph onNodeClick={setSelectedCategory} />
           </CardContent>
         </Card>
 
@@ -103,26 +105,26 @@ const Network = () => {
                     onClick={() => handlePublicationClick(pub)}
                   >
                     <div className="flex items-start justify-between gap-2 mb-2">
-                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
-                            {pub.title}
-                        </h3>
-                        {/* Wrap the icon in its own link to preserve external navigation */}
-                        <a 
-                            href={pub.link || `https://www.ncbi.nlm.nih.gov/pmc/articles/${pub.pmc_id}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()} // Stop the parent div's onClick from firing
-                            className="flex-shrink-0"
-                        >
-                            <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                        </a>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-2">
-                        {truncateText(pub.authors,10)} • {pub.year}
-                        </p>
-                        <p className="text-sm text-muted-foreground/80 leading-relaxed">
-                        {truncateText(pub.abstract, 20)}
-                        </p>
+                      <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
+                        {pub.title}
+                      </h3>
+                      {/* Wrap the icon in its own link to preserve external navigation */}
+                      <a
+                        href={pub.link || `https://www.ncbi.nlm.nih.gov/pmc/articles/${pub.pmc_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()} // Stop the parent div's onClick from firing
+                        className="flex-shrink-0"
+                      >
+                        <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      </a>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {truncateText(pub.authors, 10)} • {pub.year}
+                    </p>
+                    <p className="text-sm text-muted-foreground/80 leading-relaxed">
+                      {truncateText(pub.abstract, 20)}
+                    </p>
                   </div>
                 ))}
               </div>
