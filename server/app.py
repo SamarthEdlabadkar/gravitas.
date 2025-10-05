@@ -86,26 +86,59 @@ def search():
     return jsonify(data)
 
 
-@app.route('/kg_node/<node_id>', methods=['GET'])
-def get_node_details(node_id):
+@app.route('/kg_node/<doc_id>', methods=['GET'])
+def get_node_details(doc_id: str):
     """
     Endpoint to fetch detailed information for a specific node
     when a user clicks on it in the knowledge graph.
     """
-    # --- In a real application ---
-    # 1. Query your database/knowledge graph for the specific node_id.
-    # 2. Return its details, connections, and related publications.
 
-    # Mock response for demonstration
-    mock_node_details = {
-        "id": node_id,
-        "label": "Microgravity Effects",
-        "details": "This node represents the physiological and psychological effects of living in a low-gravity environment.",
-        "connections": ["node_1", "node_3", "node_4"],
-        "related_publications": ["pub_001", "pub_005"]
-    }
+    if not doc_id:
+        return jsonify({"error": "Context for summary is required"}), 400
+    
+    chroma_client = chromadb.PersistentClient("server/static/chroma")
+    ollama_embedder = embedding_functions.OllamaEmbeddingFunction(model_name="qwen3-embedding:4b")
 
-    return jsonify(mock_node_details)
+    if doc_id[:3] == "PMC":
+        db = "research_papers"
+    else:
+        db = "osdr_experiments"
+
+    collection = chroma_client.get_collection(name=db)
+    response = collection.query(
+        query_embeddings=ollama_embedder(["query"]),
+        n_results=1,
+        include=["metadatas", "documents"],
+        ids=[f"chunk_{doc_id}"]
+    )
+
+    query = str(response["documents"][0][0]) #type: ignore
+
+    query_embedding = ollama_embedder([query])
+
+    collection_rp = chroma_client.get_collection(name="research_papers")
+    response_rp = collection_rp.query(
+        query_embeddings=query_embedding,
+        n_results=8,
+        include=["metadatas", "documents"]
+    )
+
+    collection_oe = chroma_client.get_collection(name="osdr_experiments")
+    response_oe = collection_oe.query(
+        query_embeddings=query_embedding,
+        n_results=8,
+        include=["metadatas", "documents"]
+    )
+
+    data = []
+    for idx in range(len(response_rp["documents"][0])): #type: ignore
+        data.append((response_rp["documents"][0][idx], response_rp["metadatas"][0][idx])) #type: ignore
+    
+    for idx in range(len(response_oe["documents"][0])): #type: ignore
+        data.append((response_oe["documents"][0][idx], response_oe["metadatas"][0][idx])) #type: ignore
+    
+
+    return jsonify(data)
 
 
 @app.route('/summary', methods=['POST'])
