@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from "react";
-import HeroBg from "@/assets/hero-bg.jpg";
+import React, { useState, useRef, useEffect } from "react";
 
 // --- Type Definitions for nodes ---
 type RootNodeType = {
@@ -12,7 +11,7 @@ type RootNodeType = {
 };
 
 type ChildNodeType = {
-  id: string;
+  id:string;
   label: string;
   angle: number;
   x: number;
@@ -24,6 +23,47 @@ type ChildNodeType = {
 };
 
 type NodeType = RootNodeType | ChildNodeType;
+
+// A helper component to handle SVG text wrapping
+const WrappedText = ({ label, x, y, textAnchor, style }) => {
+    const MAX_CHARS_PER_LINE = 20;
+    const LINE_HEIGHT = 1.1; // ems
+
+    const words = label.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
+
+    words.forEach(word => {
+        if ((currentLine + word).length > MAX_CHARS_PER_LINE) {
+            lines.push(currentLine.trim());
+            currentLine = word + ' ';
+        } else {
+            currentLine += word + ' ';
+        }
+    });
+    lines.push(currentLine.trim());
+
+    // Calculate the initial y-offset to vertically center the text block
+    const yOffset = -((lines.length - 1) * LINE_HEIGHT) / 2;
+
+    return (
+        <text
+            x={x}
+            y={y}
+            textAnchor={textAnchor}
+            dominantBaseline="middle"
+            style={style}
+            className="pointer-events-none select-none transition-all duration-300"
+        >
+            {lines.map((line, index) => (
+                <tspan key={index} x={x} dy={`${index === 0 ? yOffset : LINE_HEIGHT}em`}>
+                    {line}
+                </tspan>
+            ))}
+        </text>
+    );
+};
+
 
 // The core component for rendering the radial graph
 const RadialNetworkGraph = () => {
@@ -37,9 +77,14 @@ const RadialNetworkGraph = () => {
     const handleResize = () => {
       if (containerRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
-        setDimensions({ width, height });
+        // Set a minimum size to avoid layout issues
+        const size = Math.max(300, Math.min(width, height));
+        setDimensions({ width: size, height: size });
       }
     };
+
+    // Initial size set
+    handleResize();
 
     const resizeObserver = new ResizeObserver(handleResize);
     if (containerRef.current) {
@@ -55,40 +100,35 @@ const RadialNetworkGraph = () => {
   const centerX = width / 2;
   const centerY = height / 2;
   const radius = Math.min(width, height) / 3;
-  const nodeRadius = 12; // Made child nodes smaller
-  const rootNodeRadius = 70; // Made root node much bigger
+  const nodeRadius = 10;
+  const rootNodeRadius = Math.max(40, Math.min(width, height) / 8);
 
   // --- Data Definition ---
-  // Define the central root node with an image and surrounding child nodes
   const rootNode = {
     id: 'root',
     label: 'Space Biology',
-    // Using a placeholder image as local assets aren't directly usable
-    imageUrl: HeroBg,
+    imageUrl: 'https://images.unsplash.com/photo-1541873676-a18131494184?q=80&w=2070&auto=format&fit=crop',
   };
 
   const childNodesData: { id: string; label: string }[] = [
-    { id: 'node-0', label: 'Governance' },
-    { id: 'node-1', label: 'Ethics' },
-    { id: 'node-2', label: 'Data Science' },
-    { id: 'node-3', label: 'Global Risks' },
-    { id: 'node-4', label: 'Misinformation' },
-    { id: 'node-5', label: 'Geopolitics' },
-    { id: 'node-6', label: 'Workforce' },
-    { id: 'node-7', label: 'Foundation Models' },
-    { id: 'node-8', label: 'Regulation' },
-    { id: 'node-9', label: 'Innovation' },
+    { id: 'node-0', label: 'Musculoskeletal System and Biomechanics' },
+    { id: 'node-1', label: 'Cardiovascular and Vascular Health' },
+    { id: 'node-2', label: 'Radiation Biology and DNA Damage' },
+    { id: 'node-3', label: 'Neuroscience and Sensory Systems' },
+    { id: 'node-4', label: 'Plant Gravitopism and Development' },
+    { id: 'node-5', label: 'Genomics, Omics, and Data Science' },
+    { id: 'node-6', label: 'Cellular Stress and Homeostasis' },
+    { id: 'node-7', label: 'Immunity and Hematology' },
+    { id: 'node-8', label: 'Biological Adaptations and Models' },
   ];
 
   // --- Position Calculation ---
-  // Calculate positions for nodes and their labels
   const nodes: NodeType[] = [
     { ...rootNode, x: centerX, y: centerY, isRoot: true },
     ...childNodesData.map((node, index) => {
       const angle = (index / childNodesData.length) * 2 * Math.PI - Math.PI / 2;
-      const textRadius = radius + nodeRadius + 20; // Radius for text positioning
+      const textRadius = radius + nodeRadius + 25; 
 
-      // Determine text anchor based on angle for better readability
       let textAnchor: 'start' | 'middle' | 'end' = 'middle';
       const cosAngle = Math.cos(angle);
       if (cosAngle > 0.1) textAnchor = 'start';
@@ -100,7 +140,7 @@ const RadialNetworkGraph = () => {
         x: centerX + radius * Math.cos(angle),
         y: centerY + radius * Math.sin(angle),
         textX: centerX + textRadius * Math.cos(angle),
-        textY: centerY + textRadius * Math.sin(angle) + 5, // slight vertical offset
+        textY: centerY + textRadius * Math.sin(angle),
         textAnchor: textAnchor,
         isRoot: false as const,
       };
@@ -111,17 +151,17 @@ const RadialNetworkGraph = () => {
   return (
     <div
       ref={containerRef}
-      className="bg-background/50 rounded-2xl shadow-2xl overflow-hidden border border-gray-700"
+      className="bg-black/50 rounded-2xl shadow-2xl overflow-hidden border border-gray-700"
       style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
         height: '100%',
+        minHeight: '300px',
       }}
     >
       <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%">
-        {/* Defs for image pattern and filters */}
         <defs>
           <pattern
             id="rootImage"
@@ -140,14 +180,10 @@ const RadialNetworkGraph = () => {
           </pattern>
         </defs>
 
-        {/* Render Edges (Lines) */}
         <g>
-          {/* We cast the sliced array to ensure TypeScript knows these are child nodes */}
           {(nodes.slice(1) as ChildNodeType[]).map((node) => {
-            // Calculate the end point of the line so it touches the edge of the circle
             const endX = centerX + (radius - nodeRadius) * Math.cos(node.angle);
             const endY = centerY + (radius - nodeRadius) * Math.sin(node.angle);
-
             return (
               <line
                 key={`line-${node.id}`}
@@ -159,17 +195,13 @@ const RadialNetworkGraph = () => {
                 strokeWidth="1"
                 className="transition-all duration-300"
                 style={{
-                  stroke:
-                    hoveredNode === node.id || hoveredNode === 'root'
-                      ? '#FFFFFF'
-                      : '#4A4A4A',
+                  stroke: hoveredNode === node.id || hoveredNode === 'root' ? '#FFFFFF' : '#4A4A4A',
                 }}
               />
             );
           })}
         </g>
 
-        {/* Render Node Circles */}
         <g>
           {nodes.map((node) => (
             <g
@@ -178,24 +210,19 @@ const RadialNetworkGraph = () => {
               onMouseLeave={() => setHoveredNode(null)}
             >
               <g>
-                {/* Node Circle */}
                 <circle
                   cx={node.x}
                   cy={node.y}
                   r={node.isRoot ? rootNodeRadius : nodeRadius}
-                  fill={node.isRoot ? '#0a0a0a' : (hoveredNode === node.id ? '#FFFFFF' : 'none')} // Set root node background to black
-                  fillOpacity="0.9"
+                  fill={node.isRoot ? '#0a0a0a' : (hoveredNode === node.id ? '#FFFFFF' : 'none')}
                   stroke={'#FFFFFF'}
                   strokeWidth={node.isRoot ? 1 : 1.5}
                   className="cursor-pointer transition-all duration-300"
-                  style={{
-                    transformOrigin: `${node.x}px ${node.y}px`,
-                    transform:
-                      hoveredNode === node.id ? 'scale(1.2)' : 'scale(1)',
-                  }}
+                   style={{
+                     transformOrigin: `${node.x}px ${node.y}px`,
+                     transform: hoveredNode === node.id ? 'scale(1.2)' : 'scale(1)',
+                   }}
                 />
-
-                {/* Centered Text for Root Node */}
                 {node.isRoot && (
                   <text
                     x={node.x}
@@ -215,30 +242,20 @@ const RadialNetworkGraph = () => {
           ))}
         </g>
 
-        {/* Render Text Labels for Child Nodes */}
         <g>
           {(nodes.slice(1) as ChildNodeType[]).map((node) => (
-            <text
-              key={`text-${node.id}`}
-              x={node.textX}
-              y={node.textY}
-              textAnchor={node.textAnchor}
-              fill="#CCCCCC"
-              fontSize="14px"
-              className="pointer-events-none select-none transition-all duration-300"
-              style={{
-                fill:
-                  hoveredNode === node.id || hoveredNode === 'root'
-                    ? '#FFFFFF'
-                    : '#CCCCCC',
-                fontWeight:
-                  hoveredNode === node.id || hoveredNode === 'root'
-                    ? 'bold'
-                    : 'normal',
-              }}
-            >
-              {node.label}
-            </text>
+             <WrappedText
+                key={`text-${node.id}`}
+                label={node.label}
+                x={node.textX}
+                y={node.textY}
+                textAnchor={node.textAnchor}
+                style={{
+                    fill: hoveredNode === node.id || hoveredNode === 'root' ? '#FFFFFF' : '#CCCCCC',
+                    fontWeight: hoveredNode === node.id || hoveredNode === 'root' ? 'bold' : 'normal',
+                    fontSize: '14px',
+                }}
+            />
           ))}
         </g>
       </svg>
@@ -247,3 +264,4 @@ const RadialNetworkGraph = () => {
 };
 
 export default RadialNetworkGraph;
+
