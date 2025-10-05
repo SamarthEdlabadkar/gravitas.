@@ -13,7 +13,7 @@ CORS(app)
 
 def generate_embeddings(query: str):
     ollama_embedder = embedding_functions.OllamaEmbeddingFunction(model_name="qwen3-embedding:4b")
-    
+    return ollama_embedder([query])
 
 # --- API Endpoints ---
 
@@ -26,24 +26,22 @@ def search():
     """
     data = request.get_json() 
     query = data.get('query')
-
-    chroma_client = chromadb.Client()
-    collection = chroma_client.create_collection(name="research_papers")
     
-    embeddings = generate_embeddings(query=query)
-    
-    collection.query(
-        query_embeddings=
-    )   
-
-
     if not query:
         return jsonify({"error": "Query parameter is required"}), 400
 
-    # --- In a real application ---
-    # 1. You would vectorize the user's query.
-    # 2. Query your vector database and knowledge graph.
-    # 3. Return the actual data structure for your radial tree.
+    chroma_client = chromadb.Client()
+    collection = chroma_client.get_collection(name="research_papers")
+    
+    embeddings = generate_embeddings(query=query)
+    
+    response = collection.query(
+        query_embeddings=embeddings,
+        n_results=15,
+        include=["metadatas", "distances"]
+    )
+
+    print(response.items())
 
     # Mock response for demonstration
     mock_graph_data = {
