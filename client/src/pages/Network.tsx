@@ -2,13 +2,36 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import RadialNetworkGraph from "@/components/D3Graph";
+
+type Publication = {
+  pmc_id: string;
+  title: string;
+  authors: string;
+  year: number;
+  abstract: string;
+};
+
+const truncateText = (text: string, wordLimit: number) => {
+  const words = text.split(" ");
+  if (words.length > wordLimit) {
+    return words.slice(0, wordLimit).join(" ") + " ...";
+  }
+  return text;
+};
+
 
 const Network = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+
+  const publications = location.state?.results || [];
+  const query = location.state?.query || "your query";
 
   // Placeholder publication data
+  {/* 
   const publications = [
     {
       id: 1,
@@ -52,7 +75,7 @@ const Network = () => {
       year: 2021,
       description: "Research on balance and spatial orientation adaptations during and after exposure to weightless conditions."
     }
-  ];
+  ];*/}
 
   return (
     <div className="min-h-screen w-full p-6">
@@ -95,14 +118,14 @@ const Network = () => {
         <Card className="bg-card/50 backdrop-blur-sm border-border/50 h-[calc(100vh-140px)]">
           <CardHeader>
             <CardTitle className="text-3xl font-semibold">Related Publications</CardTitle>
-            <CardDescription>Research papers matching your query</CardDescription>
+            <CardDescription>Research papers matching: "{query}"</CardDescription>
           </CardHeader>
           <CardContent className="h-[calc(100%-100px)]">
             <ScrollArea className="h-full pr-4">
               <div className="space-y-4">
-                {publications.map((pub) => (
+                {publications.map((pub: Publication) => (
                   <div
-                    key={pub.id}
+                    key={pub.pmc_id}
                     className="p-4 bg-background/50 border border-border/50 rounded-lg hover:border-primary/50 transition-all duration-200 hover:shadow-lg group cursor-pointer"
                   >
                     <div className="flex items-start justify-between gap-2 mb-2">
@@ -115,7 +138,7 @@ const Network = () => {
                       {pub.authors} • {pub.year}
                     </p>
                     <p className="text-sm text-muted-foreground/80 leading-relaxed">
-                      {pub.description}
+                      {truncateText(pub.abstract, 20)}
                     </p>
                   </div>
                 ))}

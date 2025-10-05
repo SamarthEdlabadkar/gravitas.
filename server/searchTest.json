@@ -1,0 +1,404 @@
+[
+    [
+        "Title: To infinity … and beyond! Human spaceflight and life science\nAbstract: ",
+        {
+            "authors": "\"Hughes-Fulford, M\"",
+            "journal": "The FASEB Journal",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6188462/",
+            "pmc_id": "PMC6188462",
+            "title": "To infinity … and beyond! Human spaceflight and life science",
+            "year": "2011"
+        },
+        [
+            "Musculoskeletal System and Biomechanics",
+            "Cardiovascular and Vascular Health",
+            "Radiation Biology and DNA Damage",
+            "Neuroscience and Sensory Systems",
+            "Immunity and Hematology"
+        ]
+    ],
+    [
+        "Title: Author Correction: To boldly go where no microRNAs have gone before: spaceflight impact on risk for small-for-gestational-age infants\nAbstract: ",
+        {
+            "authors": "\"Corti, G; Kim, J; Enguita, F; Guarnieri, J; Grossman, L; Costes, S; Fuentealba, M; Scott, R; Magrini, A; Sanders, L; Singh, K; Sen, C; Juran, C; Paul, A; Furman, D; Calleja-Agius, J; Mason, C; Galeano, D; Bottini, M; Beheshti, A\"",
+            "journal": "Communications Biology",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11484870/",
+            "pmc_id": "PMC11484870",
+            "title": "Author Correction: To boldly go where no microRNAs have gone before: spaceflight impact on risk for small-for-gestational-age infants",
+            "year": "2024"
+        },
+        [
+            "Microbiology and Host-Microbe Interactions",
+            "Genomics, Omics, and Data Science"
+        ]
+    ],
+    [
+        "Title: Correction: Changes in Mouse Thymus and Spleen after Return from the STS-135 Mission in Space\nAbstract: ",
+        {
+            "authors": "\"Gridley, D; Mao, X; Stodieck, L; Ferguson, V; Bateman, T; Moldovan, M; Cunningham, C; Jones, T; Slater, J; Pecaut, M\"",
+            "journal": "PLoS ONE",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3792163/",
+            "pmc_id": "PMC3792163",
+            "title": "Correction: Changes in Mouse Thymus and Spleen after Return from the STS-135 Mission in Space",
+            "year": "2013"
+        },
+        [
+            "Immunity and Hematology",
+            "Radiation Biology and DNA Damage"
+        ]
+    ],
+    [
+        "Title: Author Correction: Multi-omics analysis of multiple missions to space reveal a theme of lipid dysregulation in mouse liver\nAbstract: ",
+        {
+            "authors": "\"Beheshti, A; Chakravarty, K; Fogle, H; Fazelinia, H; Silveira, W; Boyko, V; Polo, S; Saravia-Butler, A; Hardiman, G; Taylor, D; Galazka, J; Costes, S\"",
+            "journal": "Scientific Reports",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6985101/",
+            "pmc_id": "PMC6985101",
+            "title": "Author Correction: Multi-omics analysis of multiple missions to space reveal a theme of lipid dysregulation in mouse liver",
+            "year": "2020"
+        },
+        [
+            "Radiation Biology and DNA Damage",
+            "Genomics, Omics, and Data Science"
+        ]
+    ],
+    [
+        "Title: Erratum to: Whole metagenome profiles of particulates collected from the International Space Station\nAbstract: ",
+        {
+            "authors": "\"Be, N; Avila-Herrera, A; Allen, J; Singh, N; Sielaff, A; Jaing, C; Venkateswaran, K\"",
+            "journal": "Microbiome",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5580210/",
+            "pmc_id": "PMC5580210",
+            "title": "Erratum to: Whole metagenome profiles of particulates collected from the International Space Station",
+            "year": "2017"
+        },
+        [
+            "Microbiology and Host-Microbe Interactions",
+            "Genomics, Omics, and Data Science"
+        ]
+    ],
+    [
+        "Title: Correction to: Succession and persistence of microbial communities and antimicrobial resistance genes associated with International Space Station environmental surfaces\nAbstract: ",
+        {
+            "authors": "\"Singh, N; Wood, J; Karouia, F; Venkateswaran, K\"",
+            "journal": "Microbiome",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6280456/",
+            "pmc_id": "PMC6280456",
+            "title": "Correction to: Succession and persistence of microbial communities and antimicrobial resistance genes associated with International Space Station environmental surfaces",
+            "year": "2018"
+        },
+        [
+            "Microbiology and Host-Microbe Interactions",
+            "Genomics, Omics, and Data Science"
+        ]
+    ],
+    [
+        "Title: Reanalysis of the Mars500 experiment reveals common gut microbiome alterations in astronauts induced by long-duration confinement\nAbstract: Graphical abstract",
+        {
+            "authors": "\"Brereton, N; Pitre, F; Gonzalez, E\"",
+            "journal": "Computational and Structural Biotechnology Journal",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8099722/",
+            "pmc_id": "PMC8099722",
+            "title": "Reanalysis of the Mars500 experiment reveals common gut microbiome alterations in astronauts induced by long-duration confinement",
+            "year": "2021"
+        },
+        [
+            "Microbiology and Host-Microbe Interactions",
+            "Unique Biological Adaptations and Models"
+        ]
+    ],
+    [
+        "Title: Spatial multi-omics of human skin reveals KRAS and inflammatory responses to spaceflight\nAbstract: Spaceflight can change metabolic, immunological, and biological homeostasis and cause skin rashes and irritation, yet the molecular basis remains unclear. To investigate the impact of short-duration spaceflight on the skin, we conducted skin biopsies on the Inspiration4 crew members before (L-44) and after (R + 1) flight. Leveraging multi-omics assays including GeoMx™ Digital Spatial Profiler, single-cell RNA/ATAC-seq, and metagenomics/metatranscriptomics, we assessed spatial gene expressions and associated microbial and immune changes across 95 skin regions in four compartments: outer epidermis, inner epidermis, outer dermis, and vasculature. Post-flight samples showed significant up-regulation of genes related to inflammation and KRAS signaling across all skin regions. These spaceflight-associated changes mapped to specific cellular responses, including altered interferon responses, DNA damage, epithelial barrier disruptions, T-cell migration, and hindered regeneration were located primarily in outer tissue compartments. We also linked epithelial disruption to microbial shifts in skin swab and immune cell activity to PBMC single-cell data from the same crew and timepoints. Our findings present the inaugural collection and examination of astronaut skin, offering insights for future space missions and response countermeasures.",
+        {
+            "authors": "\"Park, J; Overbey, E; Narayanan, S; Kim, J; Tierney, B; Damle, N; Najjar, D; Ryon, K; Proszynski, J; Kleinman, A; Hirschberg, J; MacKay, M; Afshin, E; Granstein, R; Gurvitch, J; Hudson, B; Rininger, A; Mullane, S; Church, S; Meydan, C; Church, G; Beheshti, A; Mateus, J; Mason, C\"",
+            "journal": "Nature Communications",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11166909/",
+            "pmc_id": "PMC11166909",
+            "title": "Spatial multi-omics of human skin reveals KRAS and inflammatory responses to spaceflight",
+            "year": "2024"
+        },
+        [
+            "Radiation Biology and DNA Damage",
+            "Immunity and Hematology",
+            "Cellular Stress and Homeostasis",
+            "Microbiology and Host-Microbe Interactions"
+        ]
+    ],
+    [
+        "Title: Collection of biospecimens from the inspiration4 mission establishes the standards for the space omics and medical atlas (SOMA)\nAbstract: The SpaceX Inspiration4 mission provided a unique opportunity to study the impact of spaceflight on the human body. Biospecimen samples were collected from four crew members longitudinally before (Launch: L-92, L-44, L-3 days), during (Flight Day: FD1, FD2, FD3), and after (Return: R + 1, R + 45, R + 82, R + 194 days) spaceflight, spanning a total of 289 days across 2021-2022. The collection process included venous whole blood, capillary dried blood spot cards, saliva, urine, stool, body swabs, capsule swabs, SpaceX Dragon capsule HEPA filter, and skin biopsies. Venous whole blood was further processed to obtain aliquots of serum, plasma, extracellular vesicles and particles, and peripheral blood mononuclear cells. In total, 2,911 sample aliquots were shipped to our central lab at Weill Cornell Medicine for downstream assays and biobanking. This paper provides an overview of the extensive biospecimen collection and highlights their processing procedures and long-term biobanking techniques, facilitating future molecular tests and evaluations.As such, this study details a robust framework for obtaining and preserving high-quality human, microbial, and environmental samples for aerospace medicine in the Space Omics and Medical Atlas (SOMA) initiative, which can aid future human spaceflight and space biology experiments.",
+        {
+            "authors": "\"Overbey, E; Ryon, K; Kim, J; Tierney, B; Klotz, R; Ortiz, V; Mullane, S; Schmidt, J; MacKay, M; Damle, N; Najjar, D; Matei, I; Patras, L; Garcia Medina, J; Kleinman, A; Wain Hirschberg, J; Proszynski, J; Narayanan, S; Schmidt, C; Afshin, E; Innes, L; Saldarriaga, M; Schmidt, M; Granstein, R; Shirah, B; Yu, M; Lyden, D; Mateus, J; Mason, C\"",
+            "journal": "Nature Communications",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11166662/",
+            "pmc_id": "PMC11166662",
+            "title": "Collection of biospecimens from the inspiration4 mission establishes the standards for the space omics and medical atlas (SOMA)",
+            "year": "2024"
+        },
+        [
+            "Genomics, Omics, and Data Science",
+            "Microbiology and Host-Microbe Interactions",
+            "Cellular Stress and Homeostasis",
+            "Immunity and Hematology",
+            "Radiation Biology and DNA Damage"
+        ]
+    ],
+    [
+        "Title: Knowledge Network Embedding of Transcriptomic Data from Spaceflown Mice Uncovers Signs and Symptoms Associated with Terrestrial Diseases\nAbstract: There has long been an interest in understanding how the hazards from spaceflight may trigger or exacerbate human diseases. With the goal of advancing our knowledge on physiological changes during space travel, NASA GeneLab provides an open-source repository of multi-omics data from real and simulated spaceflight studies. Alone, this data enables identification of biological changes during spaceflight, but cannot infer how that may impact an astronaut at the phenotypic level. To bridge this gap, Scalable Precision Medicine Oriented Knowledge Engine (SPOKE), a heterogeneous knowledge graph connecting biological and clinical data from over 30 databases, was used in combination with GeneLab transcriptomic data from six studies. This integration identified critical symptoms and physiological changes incurred during spaceflight.",
+        {
+            "authors": "\"Nelson, C; Acuna, A; Paul, A; Scott, R; Butte, A; Cekanaviciute, E; Baranzini, S; Costes, S\"",
+            "journal": "Life",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7828077/",
+            "pmc_id": "PMC7828077",
+            "title": "Knowledge Network Embedding of Transcriptomic Data from Spaceflown Mice Uncovers Signs and Symptoms Associated with Terrestrial Diseases",
+            "year": "2021"
+        },
+        [
+            "Radiation Biology and DNA Damage",
+            "Genomics, Omics, and Data Science"
+        ]
+    ],
+    [
+        "Title: Spaceflight-induced synaptic modifications within hair cells of the mammalian utricle\nAbstract: Spaceflight imposes a radically different sensory environment from that in which the inner ear utricle normally operates. We investigated synaptic modifications in utricles from mice flown aboard a space shuttle mission. Structural synaptic plasticity was detected in the medial extrastriola, a region associated with encoding static head position, as decreased synapse density. These results are remarkably congruent with a recent report of decreased utricular function in astronauts immediately after returning from the International Space Station.",
+        {
+            "authors": "\"Sultemeier, D; Choy, K; Schweizer, F; Hoffman, L\"",
+            "journal": "Journal of Neurophysiology",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5454470/",
+            "pmc_id": "PMC5454470",
+            "title": "Spaceflight-induced synaptic modifications within hair cells of the mammalian utricle",
+            "year": "2017"
+        },
+        [
+            "Neuroscience and Sensory Systems",
+            "Radiation Biology and DNA Damage",
+            "Cardiovascular and Vascular Health"
+        ]
+    ],
+    [
+        "Title: Direct RNA sequencing of astronaut blood reveals spaceflight-associated m6A increases and hematopoietic transcriptional responses\nAbstract: The advent of civilian spaceflight challenges scientists to precisely describe the effects of spaceflight on human physiology, particularly at the molecular and cellular level. Newer, nanopore-based sequencing technologies can quantitatively map changes in chemical structure and expression at single molecule resolution across entire isoforms. We perform long-read, direct RNA nanopore sequencing, as well as Ultima high-coverage RNA-sequencing, of whole blood sampled longitudinally from four SpaceX Inspiration4 astronauts at seven timepoints, spanning pre-flight, day of return, and post-flight recovery. We report key genetic pathways, including changes in erythrocyte regulation, stress induction, and immune changes affected by spaceflight. We also present the first m 6 A methylation profiles for a human space mission, suggesting a significant spike in m 6 A levels immediately post-flight. These data and results represent the first longitudinal long-read RNA profiles and RNA modification maps for each gene for astronauts, improving our understanding of the human transcriptome’s dynamic response to spaceflight.",
+        {
+            "authors": "\"Grigorev, K; Nelson, T; Overbey, E; Houerbi, N; Kim, J; Najjar, D; Damle, N; Afshin, E; Ryon, K; Thierry-Mieg, J; Thierry-Mieg, D; Melnick, A; Mateus, J; Mason, C\"",
+            "journal": "Nature Communications",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11166648/",
+            "pmc_id": "PMC11166648",
+            "title": "Direct RNA sequencing of astronaut blood reveals spaceflight-associated m6A increases and hematopoietic transcriptional responses",
+            "year": "2024"
+        },
+        [
+            "Immunity and Hematology",
+            "Genomics, Omics, and Data Science",
+            "Cellular Stress and Homeostasis"
+        ]
+    ],
+    [
+        "Title: Analyzing the relationship between gene expression and phenotype in space-flown mice using a causal inference machine learning ensemble\nAbstract: Spaceflight has several detrimental effects on human and rodent health. For example, liver dysfunction is a common phenotype observed in space-flown rodents, and this dysfunction is partially reflected in transcriptomic changes. Studies linking transcriptomics with liver dysfunction rely on tools which exploit correlation, but these tools make no attempt to disambiguate true correlations from spurious ones. In this work, we use a machine learning ensemble of causal inference methods called the Causal Research and Inference Search Platform (CRISP) which was developed to predict causal features of a binary response variable from high-dimensional input. We used CRISP to identify genes robustly correlated with a lipid density phenotype using transcriptomic and histological data from the NASA Open Science Data Repository (OSDR). Our approach identified genes and molecular targets not predicted by previous traditional differential gene expression analyses. These genes are likely to play a pivotal role in the liver dysfunction observed in space-flown rodents, and this work opens the door to identifying novel countermeasures for space travel.",
+        {
+            "authors": "\"Casaletto, J; Scott, R; Myrick, M; Mackintosh, G; Chok, H; Saravia-Butler, A; Hoarfrost, A; Galazka, J; Sanders, L; Costes, S\"",
+            "journal": "Scientific Reports",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11748630/",
+            "pmc_id": "PMC11748630",
+            "title": "Analyzing the relationship between gene expression and phenotype in space-flown mice using a causal inference machine learning ensemble",
+            "year": "2025"
+        },
+        [
+            "Genomics, Omics, and Data Science",
+            "Radiation Biology and DNA Damage",
+            "Microbiology and Host-Microbe Interactions",
+            "Immunity and Hematology",
+            "Cellular Stress and Homeostasis"
+        ]
+    ],
+    [
+        "Title: Effects of Space Flight on Mouse Liver versus Kidney: Gene Pathway Analyses\nAbstract: Understanding genome wide, tissue-specific, and spaceflight-induced changes in gene expression is critical to develop effective countermeasures. Transcriptome analysis has been performed on diverse tissues harvested from animals flown in space, but not the kidney. We determined the genome wide gene expression using a gene array analysis of kidney and liver tissue from mice flown in space for 12 days versus ground based control animals. By comparing the transcriptome of liver and kidney from animals flown in space versus ground control animals, we tested a unique hypothesis: Are there common gene expression pathways activated in multiple tissue types in response to spaceflight stimuli? Although there were tissue-specific changes, both liver and kidney overexpressed genes in the same four areas: (a) cellular responses to peptides, hormones, and nitrogen/organonitrogen compounds; (b) apoptosis and cell death; (c) fat cell differentiation and (d) negative regulation of protein kinase.",
+        {
+            "authors": "\"Hammond, T; Allen, P; Birdsall, H\"",
+            "journal": "International Journal of Molecular Sciences",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6321533/",
+            "pmc_id": "PMC6321533",
+            "title": "Effects of Space Flight on Mouse Liver versus Kidney: Gene Pathway Analyses",
+            "year": "2018"
+        },
+        [
+            "Genomics, Omics, and Data Science",
+            "Cellular Stress and Homeostasis",
+            "Immunity and Hematology"
+        ]
+    ],
+    [
+        "Title: Molecular and physiological changes in the SpaceX Inspiration4 civilian crew\nAbstract: Human spaceflight has historically been managed by government agencies, such as in the NASA Twins Study 1 , but new commercial spaceflight opportunities have opened spaceflight to a broader population. In 2021, the SpaceX Inspiration4 mission launched the first all-civilian crew to low Earth orbit, which included the youngest American astronaut (aged 29), new in-flight experimental technologies (handheld ultrasound imaging, smartwatch wearables and immune profiling), ocular alignment measurements and new protocols for in-depth, multi-omic molecular and cellular profiling. Here we report the primary findings from the 3-day spaceflight mission, which induced a broad range of physiological and stress responses, neurovestibular changes indexed by ocular misalignment, and altered neurocognitive functioning, some of which match those of long-term spaceflight 2 , but almost all of which did not differ from baseline (pre-flight) after return to Earth. Overall, these preliminary civilian spaceflight data suggest that short-duration missions do not pose a significant health risk, and moreover present a rich opportunity to measure the earliest phases of adaptation to spaceflight in the human body at anatomical, cellular, physiological and cognitive levels. Finally, these methods and results lay the foundation for an open, rapidly expanding biomedical database for astronauts 3 , which can inform countermeasure development for both private and government-sponsored space missions.",
+        {
+            "authors": "\"Jones, C; Overbey, E; Lacombe, J; Ecker, A; Meydan, C; Ryon, K; Tierney, B; Damle, N; MacKay, M; Afshin, E; Foox, J; Park, J; Nelson, T; Suhail Mohamad, M; Byhaqui, S; Aslam, B; Tali, U; Nisa, L; Menon, P; Patel, C; Khan, S; Ebert, D; Everson, A; Schubert, M; Ali, N; Sarma, M; Kim, J; Houerbi, N; Grigorev, K; Garcia Medina, J; Summers, A; Gu, J; Altin, J; Fattahi, A; Hirzallah, M; Wu, J; Stahn, A; Beheshti, A; Klotz, R; Ortiz, V; Yu, M; Patras, L; Matei, I; Lyden, D; Melnick, A; Banerjee, N; Mullane, S; Kleinman, A; Loesche, M; Menon, A; Donoviel, D; Urquieta, E; Mateus, J; Sargsyan, A; Shelhamer, M; Zenhausern, F; Bershad, E; Basner, M; Mason, C\"",
+            "journal": "Nature",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11357997/",
+            "pmc_id": "PMC11357997",
+            "title": "Molecular and physiological changes in the SpaceX Inspiration4 civilian crew",
+            "year": "2024"
+        },
+        [
+            "Neuroscience and Sensory Systems",
+            "Cellular Stress and Homeostasis",
+            "Genomics, Omics, and Data Science",
+            "Immunity and Hematology"
+        ]
+    ],
+    [
+        "Title: Spaceflight induces changes in gene expression profiles linked to insulin and estrogen\nAbstract: Organismal adaptations to spaceflight have been characterized at the molecular level in model organisms, including Drosophila and C. elegans . Here, we extend molecular work to energy metabolism and sex hormone signaling in mice and humans. We found spaceflight induced changes in insulin and estrogen signaling in rodents and humans. Murine changes were most prominent in the liver, where we observed inhibition of insulin and estrogen receptor signaling with concomitant hepatic insulin resistance and steatosis. Based on the metabolic demand, metabolic pathways mediated by insulin and estrogen vary among muscles, specifically between the soleus and extensor digitorum longus. In humans, spaceflight induced changes in insulin and estrogen related genes and pathways. Pathway analysis demonstrated spaceflight induced changes in insulin resistance, estrogen signaling, stress response, and viral infection. These data strongly suggest the need for further research on the metabolic and reproductive endocrinologic effects of space travel, if we are to become a successful interplanetary species.",
+        {
+            "authors": "\"Mathyk, B; Tabetah, M; Karim, R; Zaksas, V; Kim, J; Anu, R; Muratani, M; Tasoula, A; Singh, R; Chen, Y; Overbey, E; Park, J; Cope, H; Fazelinia, H; Povero, D; Borg, J; Klotz, R; Yu, M; Young, S; Mason, C; Szewczyk, N; St Clair, R; Karouia, F; Beheshti, A\"",
+            "journal": "Communications Biology",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11166981/",
+            "pmc_id": "PMC11166981",
+            "title": "Spaceflight induces changes in gene expression profiles linked to insulin and estrogen",
+            "year": "2024"
+        },
+        [
+            "Genomics, Omics, and Data Science",
+            "Cellular Stress and Homeostasis",
+            "Immunity and Hematology",
+            "Musculoskeletal System and Biomechanics"
+        ]
+    ],
+    [
+        "Title: Beyond Low-Earth Orbit: Characterizing Immune and microRNA Differentials following Simulated Deep Spaceflight Conditions in Mice\nAbstract: Summary Spaceflight missions can cause immune system dysfunction in astronauts with little understanding of immune outcomes in deep space. This study assessed immune responses in mice following ground-based, simulated deep spaceflight conditions, compared with data from astronauts on International Space Station missions. For ground studies, we simulated microgravity using the hindlimb unloaded mouse model alone or in combination with acute simulated galactic cosmic rays or solar particle events irradiation. Immune profiling results revealed unique immune diversity following each experimental condition, suggesting each stressor results in distinct circulating immune responses, with clear consequences for deep spaceflight. Circulating plasma microRNA sequence analysis revealed involvement in immune system dysregulation. Furthermore, a large astronaut cohort showed elevated inflammation during low-Earth orbit missions, thereby supporting our simulated ground experiments in mice. Herein, circulating immune biomarkers are defined by distinct deep space irradiation types coupled to simulated microgravity and could be targets for future space health initiatives.",
+        {
+            "authors": "\"Paul, A; Cheng-Campbell, M; Blaber, E; Anand, S; Bhattacharya, S; Zwart, S; Crucian, B; Smith, S; Meller, R; Grabham, P; Beheshti, A\"",
+            "journal": "iScience",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7756144/",
+            "pmc_id": "PMC7756144",
+            "title": "Beyond Low-Earth Orbit: Characterizing Immune and microRNA Differentials following Simulated Deep Spaceflight Conditions in Mice",
+            "year": "2020"
+        },
+        [
+            "Immunity and Hematology",
+            "Microbiology and Host-Microbe Interactions",
+            "Genomics, Omics, and Data Science"
+        ]
+    ],
+    [
+        "Title: Effects of Space Flight on Inflammasome Activation in the Brain of Mice\nAbstract: Space flight exposes astronauts to stressors that alter the immune response, rendering them vulnerable to infections and diseases. In this study, we aimed to determine the levels of inflammasome activation in the brains of mice that were housed in the International Space Station (ISS) for 37 days. C57BL/6 mice were launched to the ISS as part of NASA’s Rodent Research 1 Mission on SpaceX-4 CRS-4 Dragon cargo spacecraft from 21 September 2014 to 25 October 2014. Dissected mouse brains from that mission were analyzed by immunoblotting of inflammasome signaling proteins and Electrochemiluminescence Immunoassay (ECLIA) for inflammatory cytokine levels. Our data indicate decreased inflammasome activation in the brains of mice that were housed in the ISS for 37 days when compared to the brains of mice that were maintained on the ground, and in mice corresponding to the baseline group that were sacrificed at the time of launching of SpaceX-4. Moreover, we did not detect any significant changes in the expression levels of the pro-inflammatory cytokines TNF-α, IL-2, IFN-γ, IL-5, IL-6, IL-12p70 and IL-10 between the ground control and the flight groups. Together, these studies suggest that spaceflight results in a decrease in the levels of innate immune signaling molecules that govern inflammasome signaling in the brain of mice.",
+        {
+            "authors": "\"Roy, U; Hadad, R; Rodriguez, A; Saju, A; Roy, D; Gil, M; Keane, R; Scott, R; Mao, X; de Rivero Vaccari, J\"",
+            "journal": "Cells",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11941215/",
+            "pmc_id": "PMC11941215",
+            "title": "Effects of Space Flight on Inflammasome Activation in the Brain of Mice",
+            "year": "2025"
+        },
+        [
+            "Immunity and Hematology",
+            "Neuroscience and Sensory Systems",
+            "Radiation Biology and DNA Damage"
+        ]
+    ],
+    [
+        "Title: Single-cell multi-ome and immune profiles of the Inspiration4 crew reveal conserved, cell-type, and sex-specific responses to spaceflight\nAbstract: Spaceflight induces an immune response in astronauts. To better characterize this effect, we generated single-cell, multi-ome, cell-free RNA (cfRNA), biochemical, and hematology data for the SpaceX Inspiration4 (I4) mission crew. We found that 18 cytokines/chemokines related to inflammation, aging, and muscle homeostasis changed after spaceflight. In I4 single-cell multi-omics data, we identified a “spaceflight signature” of gene expression characterized by enrichment in oxidative phosphorylation, UV response, immune function, and TCF21 pathways. We confirmed the presence of this signature in independent datasets, including the NASA Twins Study, the I4 skin spatial transcriptomics, and 817 NASA GeneLab mouse transcriptomes. Finally, we observed that (1) T cells showed an up-regulation of FOXP3, (2) MHC class I genes exhibited long-term suppression, and (3) infection-related immune pathways were associated with microbiome shifts. In summary, this study reveals conserved and distinct immune disruptions occurring and details a roadmap for potential countermeasures to preserve astronaut health.",
+        {
+            "authors": "\"Kim, J; Tierney, B; Overbey, E; Dantas, E; Fuentealba, M; Park, J; Narayanan, S; Wu, F; Najjar, D; Chin, C; Meydan, C; Loy, C; Mathyk, B; Klotz, R; Ortiz, V; Nguyen, K; Ryon, K; Damle, N; Houerbi, N; Patras, L; Schanzer, N; Hutchinson, G; Foox, J; Bhattacharya, C; Mackay, M; Afshin, E; Hirschberg, J; Kleinman, A; Schmidt, J; Schmidt, C; Schmidt, M; Beheshti, A; Matei, I; Lyden, D; Mullane, S; Asadi, A; Lenz, J; Mzava, O; Yu, M; Ganesan, S; De Vlaminck, I; Melnick, A; Barisic, D; Winer, D; Zwart, S; Crucian, B; Smith, S; Mateus, J; Furman, D; Mason, C\"",
+            "journal": "Nature Communications",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11166952/",
+            "pmc_id": "PMC11166952",
+            "title": "Single-cell multi-ome and immune profiles of the Inspiration4 crew reveal conserved, cell-type, and sex-specific responses to spaceflight",
+            "year": "2024"
+        },
+        [
+            "Immunity and Hematology",
+            "Radiation Biology and DNA Damage",
+            "Cardiovascular and Vascular Health",
+            "Musculoskeletal System and Biomechanics"
+        ]
+    ],
+    [
+        "Title: Transcriptomics analysis reveals molecular alterations underpinning spaceflight dermatology\nAbstract: Background Spaceflight poses a unique set of challenges to humans and the hostile spaceflight environment can induce a wide range of increased health risks, including dermatological issues. The biology driving the frequency of skin issues in astronauts is currently not well understood. Methods To address this issue, we used a systems biology approach utilizing NASA’s Open Science Data Repository (OSDR) on space flown murine transcriptomic datasets focused on the skin, biochemical profiles of 50 NASA astronauts and human transcriptomic datasets generated from blood and hair samples of JAXA astronauts, as well as blood samples obtained from the NASA Twins Study, and skin and blood samples from the first civilian commercial mission, Inspiration4. Results Key biological changes related to skin health, DNA damage & repair, and mitochondrial dysregulation are identified as potential drivers for skin health risks during spaceflight. Additionally, a machine learning model is utilized to determine gene pairings associated with spaceflight response in the skin. While we identified spaceflight-induced dysregulation, such as alterations in genes associated with skin barrier function and collagen formation, our results also highlight the remarkable ability for organisms to re-adapt back to Earth via post-flight re-tuning of gene expression. Conclusion Our findings can guide future research on developing countermeasures for mitigating spaceflight-associated skin damage.",
+        {
+            "authors": "\"Cope, H; Elsborg, J; Demharter, S; McDonald, J; Wernecke, C; Parthasarathy, H; Unadkat, H; Chatrathi, M; Claudio, J; Reinsch, S; Avci, P; Zwart, S; Smith, S; Heer, M; Muratani, M; Meydan, C; Overbey, E; Kim, J; Chin, C; Park, J; Schisler, J; Mason, C; Szewczyk, N; Willis, C; Salam, A; Beheshti, A\"",
+            "journal": "Communications Medicine",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11166967/",
+            "pmc_id": "PMC11166967",
+            "title": "Transcriptomics analysis reveals molecular alterations underpinning spaceflight dermatology",
+            "year": "2024"
+        },
+        [
+            "Radiation Biology and DNA Damage",
+            "Cellular Stress and Homeostasis",
+            "Genomics, Omics, and Data Science",
+            "Immunity and Hematology",
+            "Unique Biological Adaptations and Models"
+        ]
+    ],
+    [
+        "Title: Biological horizons: pioneering open science in the cosmos\nAbstract: ",
+        {
+            "authors": "\"Costes, S; Gentemann, C; Platts, S; Carnell, L\"",
+            "journal": "Nature Communications",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11167097/",
+            "pmc_id": "PMC11167097",
+            "title": "Biological horizons: pioneering open science in the cosmos",
+            "year": "2024"
+        },
+        [
+            "Unique Biological Adaptations and Models"
+        ]
+    ],
+    [
+        "Title: Spaceflight impairs antigen-specific tolerance induction in vivo and increases inflammatory cytokines\nAbstract: The health risks of a dysregulated immune response during spaceflight are important to understand as plans emerge for humans to embark on long-term space travel to Mars. In this first-of-its-kind study, we used adoptive transfer of T-cell receptor transgenic OT-II CD4 T cells to track an in vivo antigen-specific immune response that was induced during the course of spaceflight. Experimental mice destined for spaceflight and mice that remained on the ground received transferred OT-II cells and cognate peptide stimulation with ovalbumin (OVA) 323-339 plus the inflammatory adjuvant, monophosphoryl lipid A. Control mice in both flight and ground cohorts received monophosphoryl lipid A alone without additional OVA stimulation. Numbers of OT-II cells in flight mice treated with OVA were significantly increased by 2-fold compared with ground mice treated with OVA, suggesting that tolerance induction was impaired by spaceflight. Production of proinflammatory cytokines were significantly increased in flight compared with ground mice, including a 5-fold increase in IFN-γ and a 10-fold increase in IL-17. This study is the first to show that immune tolerance may be impaired in spaceflight, leading to excessive inflammatory responses.—Chang, T. T., Spurlock, S. M, Candelario, T. L. T., Grenon, S. M., Hughes-Fulford, M. Spaceflight impairs antigen-specific tolerance induction in vivo and increases inflammatory cytokines.",
+        {
+            "authors": "\"Chang, T; Spurlock, S; Candelario, T; Grenon, S; Hughes-Fulford, M\"",
+            "journal": "The FASEB Journal",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6137544/",
+            "pmc_id": "PMC6137544",
+            "title": "Spaceflight impairs antigen-specific tolerance induction in vivo and increases inflammatory cytokines",
+            "year": "2015"
+        },
+        [
+            "Immunity and Hematology",
+            "Radiation Biology and DNA Damage",
+            "Unique Biological Adaptations and Models"
+        ]
+    ],
+    [
+        "Title: Longitudinal multi-omics analysis of host microbiome architecture and immune responses during short-term spaceflight\nAbstract: Maintenance of astronaut health during spaceflight will require monitoring and potentially modulating their microbiomes. However, documenting microbial shifts during spaceflight has been difficult due to mission constraints that lead to limited sampling and profiling. Here we executed a six-month longitudinal study to quantify the high-resolution human microbiome response to three days in orbit for four individuals. Using paired metagenomics and metatranscriptomics alongside single-nuclei immune cell profiling, we characterized time-dependent, multikingdom microbiome changes across 750 samples and 10 body sites before, during and after spaceflight at eight timepoints. We found that most alterations were transient across body sites; for example, viruses increased in skin sites mostly during flight. However, longer-term shifts were observed in the oral microbiome, including increased plaque-associated bacteria (for example, Fusobacteriota ), which correlated with immune cell gene expression. Further, microbial genes associated with phage activity, toxin–antitoxin systems and stress response were enriched across multiple body sites. In total, this study reveals in-depth characterization of microbiome and immune response shifts experienced by astronauts during short-term spaceflight and the associated changes to the living environment, which can help guide future missions, spacecraft design and space habitat planning.",
+        {
+            "authors": "\"Tierney, B; Kim, J; Overbey, E; Ryon, K; Foox, J; Sierra, M; Bhattacharya, C; Damle, N; Najjar, D; Park, J; Garcia Medina, J; Houerbi, N; Meydan, C; Wain Hirschberg, J; Qiu, J; Kleinman, A; Al-Ghalith, G; MacKay, M; Afshin, E; Dhir, R; Borg, J; Gatt, C; Brereton, N; Readhead, B; Beyaz, S; Venkateswaran, K; Wiseman, K; Moreno, J; Boddicker, A; Zhao, J; Lajoie, B; Scott, R; Altomare, A; Kruglyak, S; Levy, S; Church, G; Mason, C\"",
+            "journal": "Nature Microbiology",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11222149/",
+            "pmc_id": "PMC11222149",
+            "title": "Longitudinal multi-omics analysis of host microbiome architecture and immune responses during short-term spaceflight",
+            "year": "2024"
+        },
+        [
+            "Microbiology and Host-Microbe Interactions",
+            "Immunity and Hematology",
+            "Genomics, Omics, and Data Science"
+        ]
+    ],
+    [
+        "Title: Comprehensive Multi-Omics Analysis Reveals Mitochondrial Stress as a Central Biological Hub for Spaceflight Impact\nAbstract: Summary Spaceflight is known to impose changes on human physiology with unknown molecular etiologies. To reveal these causes, we used a multi-omics, systems biology analytical approach using biomedical profiles from fifty-nine astronauts and data from NASA’s GeneLab derived from hundreds of samples flown in space, to determine transcriptomic, proteomic, metabolomic, and epigenetic responses to spaceflight. Overall pathway analyses on the multi-omic datasets showed significant enrichment for mitochondrial processes, as well as innate immunity, chronic inflammation, cell cycle, circadian rhythm, and olfactory functions. Importantly, NASA’s Twin Study provided a platform to confirm several of our principal findings. Evidence of altered mitochondrial function and DNA damage was also found in the urine and blood metabolic data compiled from the astronaut cohort and NASA Twin Study data, indicating mitochondrial stress as a consistent phenotype of spaceflight.",
+        {
+            "authors": "\"da Silveira, W; Fazelinia, H; Rosenthal, S; Laiakis, E; Kim, M; Meydan, C; Kidane, Y; Rathi, K; Smith, S; Stear, B; Ying, Y; Zhang, Y; Foox, J; Zanello, S; Crucian, B; Wang, D; Nugent, A; Costa, H; Zwart, S; Schrepfer, S; Elworth, R; Sapoval, N; Treangen, T; MacKay, M; Gokhale, N; Horner, S; Singh, L; Wallace, D; Willey, J; Schisler, J; Meller, R; McDonald, J; Fisch, K; Hardiman, G; Taylor, D; Mason, C; Costes, S; Beheshti, A\"",
+            "journal": "Cell",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7870178/",
+            "pmc_id": "PMC7870178",
+            "title": "Comprehensive Multi-Omics Analysis Reveals Mitochondrial Stress as a Central Biological Hub for Spaceflight Impact",
+            "year": "2020"
+        },
+        [
+            "Radiation Biology and DNA Damage",
+            "Genomics, Omics, and Data Science",
+            "Cardiovascular and Vascular Health"
+        ]
+    ],
+    [
+        "Title: Cytoskeleton structure and total methylation of mouse cardiac and lung tissue during space flight\nAbstract: The purpose of this work was to evaluate the protein and mRNA expression levels of multiple cytoskeletal proteins in the cardiac and lung tissue of mice that were euthanized onboard the United States Orbital Segment of the International Space Station 37 days after the start of the SpaceX-4 mission (September 2014, USA). The results showed no changes in the cytoskeletal protein content in the cardiac and lung tissue of the mice, but there were significant changes in the mRNA expression levels of the associated genes, which may be due to an increase in total genome methylation. The mRNA expression levels of DNA methylases, the cytosine demethylases Tet1 and Tet3, histone acetylase and histone deacetylase did not change, and the mRNA expression level of cytosine demethylase Tet2 was significantly decreased.",
+        {
+            "authors": "\"Ogneva, I; Loktev, S; Sychev, V\"",
+            "journal": "PLoS ONE",
+            "link": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5955502/",
+            "pmc_id": "PMC5955502",
+            "title": "Cytoskeleton structure and total methylation of mouse cardiac and lung tissue during space flight",
+            "year": "2018"
+        },
+        [
+            "Radiation Biology and DNA Damage",
+            "Genomics, Omics, and Data Science"
+        ]
+    ]
+]
