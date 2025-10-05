@@ -1,152 +1,188 @@
 import requests
-import json
-import time
 import csv
-from typing import Dict, Any, Optional, List
+from datetime import datetime
+import time
+import json
+import sys 
 
 # --- Configuration ---
-# Updated BASE_URL to target the metadata endpoint as requested
-BASE_URL = "https://osdr.nasa.gov/osdr/data/osd/meta/"
-START_INDEX = 1
-END_INDEX = 883  # Iterating from 1 to 883 as in the original request
-MAX_RETRIES = 3
-DELAY_BETWEEN_RETRIES = 5  # seconds
-OUTPUT_CSV_FILENAME = "nasa_osdr_metadata_live.csv" # Changed filename to reflect live writing
+BASE_URL = "https://visualization.osdr.nasa.gov/biodata/api"
+# Define the range of datasets to process
+START_ID = 1
+END_ID = 883
 
-# Define the fields (header) for the CSV file
-CSV_FIELDNAMES = ['osd_number', 'title', 'description', 'authorsList']
+# Output file name and extension (all results will be appended to this file)
+OUTPUT_FILE = "dataset_summary_all_OSD.csv"
 
-def fetch_metadata(index: int) -> Optional[Dict[str, Any]]:
+# Define the column names for the CSV file (must be consistent)
+CSV_HEADERS = [
+    "accession_number", 
+    "study_title", 
+    "study_authors_combined", 
+    "study_description", 
+    "study_public_release_date_unix",
+    "study_public_release_date_readable"
+]
+# ---------------------
+
+def custom_reverse_whitespace_cleanup(text: str) -> str:
     """
-    Fetches and parses JSON metadata from the specified OSDR endpoint index with retry logic.
-
-    Args:
-        index (int): The OSD ID number to append to the BASE_URL.
-
-    Returns:
-        Optional[Dict[str, Any]]: The parsed JSON metadata dictionary on success, or None on failure.
+    Applies the custom whitespace cleanup logic: iterates in reverse, removing 
+    all single whitespaces but preserving one in a double-whitespace sequence.
     """
-    url = f"{BASE_URL}{index}"
-    print(f"\n--- Requesting URL: {url} (OSD ID {index} of {END_INDEX}) ---")
+    if not text:
+        return text
 
-    for attempt in range(MAX_RETRIES):
-        try:
-            # Send the GET request with a timeout
-            response = requests.get(url, timeout=10)
+    # Reverse the string and convert it to a list of characters for manipulation
+    chars = list(text[::-1])
+    cleaned_chars_reverse = []
+    prev_was_whitespace = False
+    first_whitespace_removed = False
 
-            # 1. Check for successful HTTP status code (e.g., 200 OK)
-            if response.status_code == 200:
-                print(f"Status: SUCCESS (200 OK)")
-
-                # 2. Try to parse the response as JSON
-                try:
-                    data = response.json()
-                    return data # Return the parsed data dictionary
-
-                except json.JSONDecodeError:
-                    print(f"Error: Could not decode JSON response for meta/{index}. Raw text: {response.text[:200]}...")
-                    return None # Failed to decode JSON
-
-            elif response.status_code == 404:
-                print(f"Status: FAILED (404 Not Found) for meta/{index}. Endpoint may not exist.")
-                return None # Stop retrying on 404
-
+    for char in chars:
+        if char == ' ':
+            if prev_was_whitespace:
+                # This is the second of two repeating whitespaces. Keep one.
+                cleaned_chars_reverse.append(char)
+                prev_was_whitespace = False
             else:
-                # Handle other client/server errors
-                print(f"Status: FAILED (HTTP {response.status_code}) for meta/{index}. Retrying...")
-                if attempt < MAX_RETRIES - 1:
-                    time.sleep(DELAY_BETWEEN_RETRIES)
+                # This is the first whitespace or a single one. Remove it.
+                if not first_whitespace_removed:
+                    first_whitespace_removed = True
                 else:
-                    print(f"Error: Max retries reached for meta/{index}.")
-                    return None
+                    pass  # Don't append the char
+                
+                prev_was_whitespace = True
+        else:
+            # Regular character, keep it.
+            cleaned_chars_reverse.append(char)
+            prev_was_whitespace = False
 
-        except requests.exceptions.RequestException as e:
-            # Handle network errors
-            print(f"Connection Error for meta/{index} on attempt {attempt + 1}: {e}. Retrying in {DELAY_BETWEEN_RETRIES} seconds...")
-            if attempt < MAX_RETRIES - 1:
-                time.sleep(DELAY_BETWEEN_RETRIES)
-            else:
-                print(f"Fatal Error: Connection failed after {MAX_RETRIES} attempts for meta/{index}.")
-                return None
-    return None
+    # Join the reversed list and reverse it back to the original order
+    return "".join(cleaned_chars_reverse)[::-1]
 
-def process_and_write_row(data: Dict[str, Any], osd_number: int, writer: csv.DictWriter, success_counter: list):
+
+def get_and_clean_metadata(accession_number: str) -> dict | None:
     """
-    Extracts, formats, writes a single row to CSV, and prints the summary.
+    Fetches and cleans metadata for a single accession number.
+    Returns a dictionary of cleaned data or None on failure.
+    Includes logic to set 1969 dates (negative Unix timestamps) to "N/A".
     """
+    url = f"{BASE_URL}/v2/dataset/{accession_number}/"
+    
     try:
-        title = data.get('title', 'N/A')
-        description = data.get('description', 'N/A')
-        authors = data.get('authorsList', 'N/A')
-
-        # --- CSV Preparation ---
-        csv_row = {
-            'osd_number': osd_number,
-            'title': title,
-            'description': description,
-            # Convert the authors list to a semicolon-separated string
-            'authorsList': "; ".join(authors) if isinstance(authors, list) else str(authors)
-        }
+        response = requests.get(url, timeout=30)
+        response.raise_for_status() 
+        dataset_data = response.json()
         
-        # Write the row to the CSV file
-        writer.writerow(csv_row)
-        success_counter[0] += 1
+        # Access the main metadata object
+        metadata = dataset_data.get(accession_number, {}).get('metadata', {})
+        
+        if not metadata:
+            raise ValueError(f"Metadata block is empty for {accession_number}.")
 
-        # --- Terminal Summary (5 words of description) ---
-        desc_words = description.split()
-        summary_desc = " ".join(desc_words[:5]) + ("..." if len(desc_words) > 5 else "")
-        author_count = len(authors) if isinstance(authors, list) else 0
+        # --- Extraction and Cleaning ---
+        
+        title = metadata.get('study title', 'N/A')
+        
+        # Authors
+        study_person = metadata.get('study person', {})
+        first_names = study_person.get('first name', '')
+        last_names = study_person.get('last name', '')
+        authors_combined = f"{first_names} {last_names}".strip().replace("  ", " ")
 
-        print(f"-> SUCCESS (OSD-{osd_number}): Wrote to CSV.")
-        print(f"   [Summary] Title: '{title}' | Authors: {author_count} | Desc: '{summary_desc}'")
+        # Description
+        description_list = metadata.get('study description', [])
+        temp_description = " ".join(s.strip() for s in description_list if s is not None).strip()
+        description = custom_reverse_whitespace_cleanup(temp_description)
 
-    except Exception as e:
-        print(f"-> EXTRACTION/WRITE FAILED for OSD-{osd_number}. Error: {e}")
-        # Note: Caller function will handle incrementing the fail_count
-        raise # Re-raise to be caught by the main loop's error handling
+        # Date Conversion and 1969 Check
+        release_unix = metadata.get('study public release date', 'N/A')
+        release_readable = 'N/A'
+        
+        if isinstance(release_unix, int):
+            # The Unix epoch starts Jan 1, 1970 (timestamp 0)
+            # Negative values indicate times before the epoch (e.g., in 1969)
+            if release_unix < 0:
+                # Skip 1969 dates (negative timestamps) by setting to N/A
+                release_unix = 'N/A'
+            else:
+                # Convert valid Unix timestamp
+                release_readable = datetime.fromtimestamp(release_unix).strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Ensure the Unix time is "N/A" if the readable time is "N/A" (e.g., if it was < 0)
+        if release_readable == 'N/A':
+            release_unix = 'N/A'
+        print(f"Processed {accession_number} successfully.")
 
+        # Prepare the data dictionary
+        return {
+            "accession_number": accession_number,
+            "study_title": title,
+            "study_authors_combined": authors_combined,
+            "study_description": description,
+            "study_public_release_date_unix": release_unix,
+            "study_public_release_date_readable": release_readable
+        }
+
+    except (requests.exceptions.RequestException, ValueError, json.JSONDecodeError, KeyError) as e:
+        # A failed request (404, 500, timeout) or data parsing error
+        return None
+
+
+def run_bulk_extraction():
+    """
+    Iterates through the dataset range, collects data, and writes to a single CSV file.
+    """
+    
+    skipped_count = 0
+    successful_count = 0
+    
+    # Check if the output file exists to determine if we should write headers
+    try:
+        with open(OUTPUT_FILE, 'r') as f:
+            # File exists, do not write headers
+            write_headers = False
+    except FileNotFoundError:
+        # File does not exist, write headers
+        write_headers = True
+
+    # Use 'a' mode to append to the file
+    with open(OUTPUT_FILE, 'a', newline='', encoding='utf-8') as csvfile:
+        csv_writer = csv.DictWriter(csvfile, fieldnames=CSV_HEADERS)
+        
+        if write_headers:
+            csv_writer.writeheader()
+
+        print(f"Starting bulk extraction from OSD-{START_ID} to OSD-{END_ID}...")
+        print(f"Results will be written to: {OUTPUT_FILE}")
+
+        for i in range(START_ID, END_ID + 1):
+            accession = f"OSD-{i}"
+            
+            # Fetch and process metadata
+            data_row = get_and_clean_metadata(accession)
+            
+            if data_row:
+                csv_writer.writerow(data_row)
+                successful_count += 1
+                # Prints a status update every 50 records
+                if successful_count % 50 == 0:
+                     print(f"✅ Processed {accession} ({successful_count} total successful)")
+            else:
+                skipped_count += 1
+                # Prints a skipped status immediately
+                # print(f"❌ Skipped {accession} (Not Accessible/Error)")
+            
+            # Add a small delay for API etiquette
+            time.sleep(0.1)
+
+    print("\n" + "=" * 50)
+    print("BULK PROCESSING COMPLETE")
+    print(f"Total datasets in range: {END_ID - START_ID + 1}")
+    print(f"Successful records written to CSV: {successful_count}")
+    print(f"Skipped/Failed to access files count: {skipped_count}")
+    print("=" * 50)
 
 if __name__ == "__main__":
-    print(f"Starting programmatic metadata fetch and extraction from NASA OSDR for OSD IDs {START_INDEX} through {END_INDEX}...")
-    print(f"Results will be written incrementally to '{OUTPUT_CSV_FILENAME}'.")
-
-    success_count_list = [0] # Use a list to pass success count by reference to helper function
-    fail_count = 0
-    total_requests = END_INDEX - START_INDEX + 1
-
-    # --- Setup CSV File Writing ---
-    try:
-        # Open the file once before the loop for incremental writing
-        with open(OUTPUT_CSV_FILENAME, 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=CSV_FIELDNAMES)
-            writer.writeheader() # Write the header row once
-
-            # --- Main Processing Loop ---
-            for i in range(START_INDEX, END_INDEX + 1):
-                fetched_data = fetch_metadata(i)
-
-                if fetched_data:
-                    try:
-                        # Extract, write to CSV, and print summary
-                        process_and_write_row(fetched_data, i, writer, success_count_list)
-
-                    except Exception:
-                        fail_count += 1
-                else:
-                    fail_count += 1
-            
-            # success_count is the first element of the list
-            success_count = success_count_list[0] 
-
-    except IOError as e:
-        print(f"\nFATAL: Could not open or write to CSV file {OUTPUT_CSV_FILENAME}: {e}")
-        success_count = success_count_list[0] # Get current count even if file failed later
-
-    print("\n=============================================")
-    print("Metadata Fetching and Extraction Process Complete.")
-    print("=============================================")
-    print(f"Total Requests Attempted: {total_requests}")
-    print(f"Successfully Processed and Wrote to CSV: {success_count}")
-    print(f"Failed Requests or Extraction Errors: {fail_count}")
-    print(f"Final Data available in '{OUTPUT_CSV_FILENAME}'.")
-    print("=============================================")
+    run_bulk_extraction()
