@@ -53,7 +53,6 @@ const KnowledgeGraph = () => {
       setIsLoading(true);
       setError(null);
       try {
-        // --- MODIFIED FETCH CALL ---
         // The summary call is now a POST request sending both the query and the current publication's ID.
         const [summaryRes, kgNodeRes] = await Promise.all([
           fetch(`http://127.0.0.1:5000/summary`, {

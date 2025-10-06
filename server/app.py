@@ -221,8 +221,7 @@ def status():
     """
     return jsonify({"status": "API is running"})
 
-# This block allows you to run the app directly from the command line
-# using `python app.py`
+
 if __name__ == '__main__':
     # Runs the app on http://127.0.0.1:5000
     app.run(debug=True, port=5000)
