@@ -142,6 +142,3 @@ Feel free to use, modify, and distribute with attribution.
 * [Vite](https://vitejs.dev/)
 * [ShadCN/UI](https://ui.shadcn.com/)
 
----
-
-Would you like me to tailor this README for **research-focused users** (e.g., scientists exploring data) or **developer-focused users** (for setup and contribution)? I can adjust tone and structure accordingly.
