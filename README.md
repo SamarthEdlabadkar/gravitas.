@@ -1,4 +1,4 @@
-# 🧠 Gravitas
+# Gravitas.
 
 **Gravitas** is a full-stack web application for **interactive knowledge exploration** — combining **AI-powered data processing** with a **dynamic, D3.js-driven knowledge graph interface**.
 It enables users to visualize relationships between research publications, datasets, and concepts, transforming static text into insightful visual connections.
@@ -7,14 +7,14 @@ It enables users to visualize relationships between research publications, datas
 
 ## 🚀 Features
 
-### 🔍 Intelligent Backend
+### Intelligent Backend
 
 * **Data Extraction & Categorization:** Uses `PubMed` and `Open Science Data` APIs for sourcing and organizing research data.
 * **Vectorization & Semantic Search:** Employs custom vectorizers (`vectorizer_pubmed.py`, `vectorizer_osd.py`) for embedding and similarity computation.
 * **Automated Summarization:** Generates concise summaries of search results and documents.
 * **API-driven Architecture:** Flask backend (`app.py`) handles requests and integrates all processing pipelines.
 
-### 🌐 Interactive Frontend
+### Interactive Frontend
 
 * **Dynamic Graph Visualization:** Built using **D3.js** and **TypeScript + React**, enabling real-time, animated network exploration.
 * **Modern UI Library:** 50+ reusable components (accordion, chart, dialog, slider, etc.) for consistent design and responsiveness.
@@ -23,7 +23,7 @@ It enables users to visualize relationships between research publications, datas
 
 ---
 
-## 🧩 Tech Stack
+## Tech Stack
 
 | Layer               | Technology                               |
 | ------------------- | ---------------------------------------- |
@@ -141,4 +141,5 @@ Feel free to use, modify, and distribute with attribution.
 * [D3.js](https://d3js.org/)
 * [Vite](https://vitejs.dev/)
 * [ShadCN/UI](https://ui.shadcn.com/)
+
 
