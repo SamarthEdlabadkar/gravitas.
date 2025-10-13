@@ -6,14 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import nebulaBg from "@/assets/carinanebula3-bg.jpg";
 import demoPreview from "@/assets/demo-preview.jpg";
+import type { APIResponse, Publication } from "@/types";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  // This state is not strictly necessary anymore since we navigate immediately,
-  // but it's good practice to keep it for potential future use (e.g., showing results on the same page).
-  const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -36,10 +34,10 @@ const Index = () => {
         throw new Error('Network response was not ok');
       }
 
-      const rawData = await response.json();
+      const rawData: APIResponse = await response.json();
 
       // **1. Process the complex API response into a clean array of objects**
-      const processedResults = rawData.map((item: any) => {
+      const processedResults: Publication[] = rawData.map((item) => {
         const abstractText = item[0]?.split('Abstract: ')[1] || "No abstract available.";
         const metadata = item[1];
         const categories = item[2];
@@ -56,14 +54,12 @@ const Index = () => {
           categories: categories || [], // Ensure categories is always an array
         };
       });
-      
-      setResults(processedResults);
 
       // **2. Navigate with the newly processed, clean data**
       navigate("/network", { state: { results: processedResults, query: searchQuery } });
 
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
