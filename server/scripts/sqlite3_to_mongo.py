@@ -25,9 +25,9 @@ import dotenv
 dotenv.load_dotenv()
 
 SQLITE_PATH = os.environ.get('SQLITE_PATH', 'server/static/papers.db')
-MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017')
-MONGO_DB = os.environ.get('MONGO_DB', 'medosearch')
-MONGO_COLLECTION = os.environ.get('MONGO_COLLECTION', 'classifications')
+MONGO_URI = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017')
+MONGO_DB = os.environ.get('MONGO_DB_NAME', 'medosearch')
+MONGO_COLLECTION = os.environ.get('MONGO_COLLECTION_NAME', 'classifications')
 
 
 def parse_classification(value: Any) -> List[str]:
@@ -110,6 +110,9 @@ def upsert_rows(mongo_uri: str, db_name: str, collection_name: str, rows: List[D
 def main():
     rows = read_sqlite_rows(SQLITE_PATH)
     print(f"Read {len(rows)} rows from {SQLITE_PATH}")
+
+    print(rows[0])
+
     count = upsert_rows(MONGO_URI, MONGO_DB, MONGO_COLLECTION, rows)
     print(f"Upserted/modified approx {count} docs into {MONGO_DB}.{MONGO_COLLECTION}")
 
