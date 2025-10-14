@@ -24,7 +24,7 @@ type ChildNodeType = {
 
 type NodeType = RootNodeType | ChildNodeType;
 
-// --- Prop Types for the component (Corrected) ---
+// --- Prop Types for the component ---
 interface DynamicGraphProps {
     rootNode: { id: string; label: string };
     childNodes: { id: string; label: string }[];
@@ -74,7 +74,6 @@ const WrappedText: React.FC<any> = ({ label, x, y, textAnchor, style }) => {
 
 
 // The core component for rendering the radial graph
-// **FIX 1: Use correct prop destructuring and typing**
 const DynamicGraph: React.FC<DynamicGraphProps> = ({ rootNode, childNodes: childNodesData, onNodeClick }) => {
   // --- Component State & Configuration ---
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
@@ -122,7 +121,6 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ rootNode, childNodes: child
   const nodeRadius = 10;
   const rootNodeRadius = Math.max(40, Math.min(width, height) / 8);
 
-  // **FIX 2: Remove hardcoded data definitions. The props are now used directly.**
   // --- Position Calculation ---
   const nodes: NodeType[] = [
     // Use the prop-passed rootNode
@@ -166,7 +164,6 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ rootNode, childNodes: child
       }}
     >
       <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%">
-        {/* **FIX 3: Remove defs/pattern for rootImage since imageUrl is no longer a prop** If you want to re-add image functionality, you'll need to update the prop types in KnowledgeGraph.tsx too. */}
         {/* Lines from center to child nodes (keep as is) */}
         <g>
           {(nodes.slice(1) as ChildNodeType[]).map((node) => {
@@ -198,7 +195,6 @@ const DynamicGraph: React.FC<DynamicGraphProps> = ({ rootNode, childNodes: child
               onMouseEnter={() => setHoveredNode(node.id)}
               onMouseLeave={() => setHoveredNode(null)}
               className="cursor-pointer"
-              // **FIX 4: Pass the node ID, not the label, to the click handler**
               onClick={() => onNodeClick(node.isRoot ? rootNode.id : node.id)} 
             >
               <g>
