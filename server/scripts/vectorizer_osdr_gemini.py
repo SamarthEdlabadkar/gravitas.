@@ -8,7 +8,6 @@ from chromadb.api.types import Documents, Embeddings
 from chromadb.utils import embedding_functions
 from dotenv import load_dotenv
 
-# Load environment variables (for GEMINI_API_KEY)
 load_dotenv()
 
 # --- Configuration ---
@@ -39,7 +38,6 @@ class GeminiEmbeddingFunction(embedding_functions.EmbeddingFunction):
         embeddings_list: List[List[float]] = []
         
         try:
-            # Removed 'task_type' to fix previous error.
             result = self.client.models.embed_content(
                 model=self.model,
                 contents=input, 
@@ -62,7 +60,7 @@ class GeminiEmbeddingFunction(embedding_functions.EmbeddingFunction):
 
         except Exception as e:
             # Log the Quota error clearly
-            print(f"❌ Error calling Gemini embedding API for batch of size {len(input)}: {e}")
+            print(f" Error calling Gemini embedding API for batch of size {len(input)}: {e}")
             return [] 
 
 # ----------------------------------------------------------------------
@@ -83,7 +81,7 @@ client = chromadb.PersistentClient(CHROMA_PATH)
 print(f"\n--- ChromaDB Setup ---")
 try:
     client.delete_collection(name=COLLECTION_NAME)
-    print(f"✅ Successfully deleted old collection: '{COLLECTION_NAME}'")
+    print(f" Successfully deleted old collection: '{COLLECTION_NAME}'")
 except ValueError as e:
     if "does not exist" in str(e):
         print(f"Collection '{COLLECTION_NAME}' did not exist, proceeding to create.")
@@ -119,7 +117,7 @@ try:
         header = next(reader, None) 
         
         if header is None:
-             print("❌ Error: CSV file is empty.")
+             print("Error: CSV file is empty.")
              exit()
 
         for i, row in enumerate(reader):
@@ -156,8 +154,8 @@ try:
                         metadatas=metadatas
                     )
                     
-                    # --- ACTION: Introduce 60-second delay to respect API rate limit ---
-                    print("⏸️ Quota delay: Sleeping for 60 seconds...")
+                    # --- ACTION: Introduce 60-second delay for API rate limit ---
+                    print("Quota delay: Sleeping for 60 seconds...")
                     time.sleep(60) # Pause for 1 minute after adding a batch
                     
                     # Reset batches
@@ -169,7 +167,7 @@ try:
                 print(f"Skipping row {row_counter}. Unexpected error: {e}")
 
 
-        # Add any remaining documents (the final partial batch)
+        # Add any remaining documents
         if ids:
             print(f"Processing final batch of {len(ids)} documents...")
             collection.add(
@@ -177,14 +175,13 @@ try:
                 documents=documents,
                 metadatas=metadatas
             )
-            # Introduce a final delay
+            # Delay after final batch
             time.sleep(1)
 
-        # --- FINAL VERIFICATION ---
         final_count = collection.count()
-        print(f"\n✅ Processing complete. Total rows in CSV: {row_counter}. Final ChromaDB count: {final_count}")
+        print(f"\nProcessing complete. Total rows in CSV: {row_counter}. Final ChromaDB count: {final_count}")
 
 except FileNotFoundError:
-    print(f"❌ Error: CSV file not found at {CSV_FILE_PATH}")
+    print(f"Error: CSV file not found at {CSV_FILE_PATH}")
 except Exception as e:
-    print(f"❌ An unexpected critical error occurred: {e}") 
+    print(f"An unexpected critical error occurred: {e}") 

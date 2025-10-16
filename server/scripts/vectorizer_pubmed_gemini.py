@@ -8,7 +8,6 @@ from chromadb.api.types import Documents, Embeddings
 from chromadb.utils import embedding_functions
 from dotenv import load_dotenv
 
-# Load environment variables (ensure GEMINI_API_KEY is available)
 load_dotenv()
 
 # --- Configuration ---
@@ -25,7 +24,7 @@ CSV_FILE_PATH = "server/static/data_pubmed.csv"
 MODEL_NAME = "models/gemini-embedding-001"
 EMBEDDING_DIMENSION = 2560 
 BATCH_SIZE = 50 
-DELAY_SECONDS = 60 # Pause for 1 minute to manage API quota
+DELAY_SECONDS = 60  # Delay after each batch to manage quota
 
 # --- Custom Gemini Embedding Function for ChromaDB ---
 
@@ -41,7 +40,6 @@ class GeminiEmbeddingFunction(embedding_functions.EmbeddingFunction):
         embeddings_list: List[List[float]] = []
         
         try:
-            # Uses 'contents' (plural) and includes output_dimensionality
             result = self.client.models.embed_content(
                 model=self.model,
                 contents=input, 
@@ -63,10 +61,10 @@ class GeminiEmbeddingFunction(embedding_functions.EmbeddingFunction):
 
         except Exception as e:
             # Log potential API errors (like Quota Exceeded)
-            print(f"❌ Error calling Gemini embedding API for batch of size {len(input)}: {e}")
+            print(f"Error calling Gemini embedding API for batch of size {len(input)}: {e}")
             return [] 
 
-# --- Helper Function to Handle Deduplication and Insertion ---
+# --- Helper Function to Handle De-duplication and Insertion ---
 
 def add_batch_to_chroma(
     ids: List[str], 
@@ -82,7 +80,7 @@ def add_batch_to_chroma(
     if not ids:
         return 0
         
-    # --- DEDUPLICATION LOGIC: Use a dict to keep only the last occurrence of each ID ---
+    # --- DEDUPLICATION: Use a dict to keep only the last occurrence of each ID ---
     unique_data: Dict[str, Tuple[str, Dict]] = {}
     for i in range(len(ids)):
         unique_data[ids[i]] = (documents[i], metadatas[i])
@@ -94,7 +92,7 @@ def add_batch_to_chroma(
     # Reporting on deduplication
     duplicates_found = len(ids) - len(unique_ids)
     if duplicates_found > 0:
-        print(f"⚠️ Warning: Removed {duplicates_found} local duplicates from this batch.")
+        print(f"Warning: Removed {duplicates_found} local duplicates from this batch.")
 
     if unique_ids:
         print(f"Processing unique batch of {len(unique_ids)} documents...")
@@ -105,7 +103,7 @@ def add_batch_to_chroma(
         )
         
         # Quota Management: Pause after a successful API call
-        print(f"⏸️ Batch completed. Quota delay: Sleeping for {delay} seconds...")
+        print(f"Batch completed. Quota delay: Sleeping for {delay} seconds...")
         time.sleep(delay) 
         
     return len(unique_ids)
@@ -128,7 +126,7 @@ client = chromadb.PersistentClient(CHROMA_PATH)
 print(f"\n--- ChromaDB Setup ---")
 try:
     client.delete_collection(name=COLLECTION_NAME)
-    print(f"✅ Successfully deleted old collection: '{COLLECTION_NAME}'")
+    print(f"Successfully deleted old collection: '{COLLECTION_NAME}'")
 except ValueError as e:
     if "does not exist" in str(e):
         print(f"Collection '{COLLECTION_NAME}' did not exist, proceeding to create.")
@@ -164,7 +162,7 @@ try:
         header = next(reader, None)
         
         if header is None:
-             print("❌ Error: CSV file is empty.")
+             print("Error: CSV file is empty.")
              exit()
 
         for i, row in enumerate(reader):
@@ -220,18 +218,17 @@ try:
                 print(f"Skipping row {row_counter}. Unexpected error: {e}")
 
 
-        # Add any remaining documents (the final partial batch)
+        # Add any remaining documents
         if ids:
             added_count = add_batch_to_chroma(ids, documents, metadatas, collection, 1) # Short delay for final small batch
             total_added += added_count
 
-        # --- FINAL VERIFICATION ---
         final_count = collection.count()
-        print(f"\n✅ Processing complete.")
+        print(f"\nProcessing complete.")
         print(f"Total rows read from CSV: {row_counter}")
         print(f"Total unique documents added to ChromaDB: {final_count} (Expected added count: {total_added})")
 
 except FileNotFoundError:
-    print(f"❌ Error: CSV file not found at {CSV_FILE_PATH}")
+    print(f"Error: CSV file not found at {CSV_FILE_PATH}")
 except Exception as e:
-    print(f"❌ An unexpected critical error occurred: {e}")
+    print(f"An unexpected critical error occurred: {e}")
