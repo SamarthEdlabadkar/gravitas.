@@ -5,17 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate, useLocation } from "react-router-dom";
 import RadialNetworkGraph from "@/components/D3Graph";
 import { useState, useMemo } from "react";
-
-type Publication = {
-  pmc_id: string;
-  title: string;
-  authors: string;
-  journal: string;
-  link: string;
-  year: number;
-  abstract: string;
-  categories: string[];
-};
+import type { Publication } from "@/types";
 
 const truncateText = (text: string, wordLimit: number) => {
   const words = text.split(" ");
@@ -30,20 +20,22 @@ const Network = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const publications = location.state?.results || [];
+  const publications = useMemo(() => {
+    return location.state?.results || [];
+  }, [location.state?.results]);
+
   const query = location.state?.query || "your query";
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const filteredPublications = useMemo(() => {
     // If no category is selected, show all publications
     if (!selectedCategory) {
       return publications;
     }
 
-    
     // Otherwise, only show publications that include the selected category
-    return publications.filter(pub =>
+    return publications.filter((pub: Publication) =>
       pub.categories.includes(selectedCategory)
     );
   }, [selectedCategory, publications]);

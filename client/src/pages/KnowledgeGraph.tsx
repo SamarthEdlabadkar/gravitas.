@@ -6,24 +6,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import DynamicGraph from "@/components/DynamicGraph";
-import { Skeleton } from "@/components/ui/skeleton";
-
-// --- Type Definitions ---
-type Publication = {
-  pmc_id: string;
-  title: string;
-  authors: string;
-  journal: string;
-  link: string;
-  year: number | string;
-  abstract: string;
-  categories?: string[];
-};
-
-type KGNode = {
-  pmc_id: string;
-  title: string;
-}
+import type { 
+  Publication, 
+  KGNode, 
+  SummaryResponse, 
+  KGNodeResponse
+} from "@/types";
 
 const KnowledgeGraph = () => {
   const navigate = useNavigate();
@@ -35,7 +23,7 @@ const KnowledgeGraph = () => {
 
   // --- State Management for Dynamic Updates ---
   const [currentPublication, setCurrentPublication] = useState<Publication | null>(initialPublication);
-  const [summaryData, setSummaryData] = useState<Publication | null>(null);
+  const [summaryData, setSummaryData] = useState<string | null>(null);
   const [childNodes, setChildNodes] = useState<KGNode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,12 +60,10 @@ const KnowledgeGraph = () => {
           throw new Error('Failed to fetch data from the server.');
         }
 
-        const rawSummary = await summaryRes.json().then((val) => {
-          let summary = val.summary;
-          setSummaryData(summary);
-        });
+        const summaryData: SummaryResponse = await summaryRes.json();
+        setSummaryData(summaryData.summary);
 
-        const rawKgNodes = await kgNodeRes.json();
+        const rawKgNodes: KGNodeResponse = await kgNodeRes.json();
         console.log(rawKgNodes);
 
         // --- PARSE KG_NODE RESPONSE ---
@@ -88,7 +74,7 @@ const KnowledgeGraph = () => {
           const rootPmcId = currentPublication.pmc_id;
 
           const formattedChildNodes = nodesArray
-            .map((node: any) => { // Use 'any' here for flexibility with the array structure
+            .map((node): KGNode | null => {
               // Check if the node is an array of length 2 and the second element is an object
               if (Array.isArray(node) && node.length > 1 && typeof node[1] === 'object' && node[1] !== null) {
                 const meta = node[1];
@@ -119,8 +105,8 @@ const KnowledgeGraph = () => {
           throw new Error('Unexpected kg_node API response format: "data" property is missing or is not an array.');
         }
 
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
       } finally {
         setIsLoading(false);
       }
@@ -139,7 +125,7 @@ const KnowledgeGraph = () => {
       const newPublication: Publication = {
         pmc_id: clickedNode.pmc_id,
         title: clickedNode.title,
-        authors: '', journal: '', link: '', year: '', abstract: '' // Blank data to be filled by fetch
+        authors: '', journal: '', link: '', year: 0, abstract: '', categories: [] // Blank data to be filled by fetch
       };
       // Set it as the new current publication, which triggers the useEffect
       setCurrentPublication(newPublication);

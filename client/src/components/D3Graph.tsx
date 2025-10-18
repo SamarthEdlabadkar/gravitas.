@@ -1,31 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-
-// --- Type Definitions for nodes ---
-type RootNodeType = {
-  id: string;
-  label: string;
-  imageUrl: string;
-  x: number;
-  y: number;
-  isRoot: true;
-};
-
-type ChildNodeType = {
-  id:string;
-  label: string;
-  angle: number;
-  x: number;
-  y: number;
-  textX: number;
-  textY: number;
-  textAnchor: 'start' | 'middle' | 'end';
-  isRoot: false;
-};
-
-type NodeType = RootNodeType | ChildNodeType;
+import { useState, useRef, useEffect } from "react";
+import type { 
+  WrappedTextProps, 
+  RadialNetworkGraphProps, 
+  RootNodeType, 
+  ChildNodeType, 
+  NodeType 
+} from "@/types";
 
 // A helper component to handle SVG text wrapping
-const WrappedText = ({ label, x, y, textAnchor, style }) => {
+const WrappedText = ({ label, x, y, textAnchor, style }: WrappedTextProps) => {
     const MAX_CHARS_PER_LINE = 20;
     const LINE_HEIGHT = 1.1; // ems
 
@@ -33,7 +16,7 @@ const WrappedText = ({ label, x, y, textAnchor, style }) => {
     const lines: string[] = [];
     let currentLine = '';
 
-    words.forEach(word => {
+    words.forEach((word: string) => {
         if ((currentLine + word).length > MAX_CHARS_PER_LINE) {
             lines.push(currentLine.trim());
             currentLine = word + ' ';
@@ -66,7 +49,7 @@ const WrappedText = ({ label, x, y, textAnchor, style }) => {
 
 
 // The core component for rendering the radial graph
-const RadialNetworkGraph = ({onNodeClick}) => {
+const RadialNetworkGraph = ({ onNodeClick }: RadialNetworkGraphProps) => {
   // --- Component State & Configuration ---
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [dimensions, setDimensions] = useState({ width: 700, height: 700 });
@@ -104,7 +87,7 @@ const RadialNetworkGraph = ({onNodeClick}) => {
   const rootNodeRadius = Math.max(40, Math.min(width, height) / 8);
 
   // --- Data Definition ---
-  const rootNode = {
+  const rootNode: Omit<RootNodeType, 'x' | 'y' | 'isRoot'> = {
     id: 'root',
     label: 'Space Biology',
     imageUrl: 'https://images.unsplash.com/photo-1541873676-a18131494184?q=80&w=2070&auto=format&fit=crop',
