@@ -1,24 +1,15 @@
 import os
 from flask import Flask, jsonify, request
-from flask_cors import CORS
-import chromadb
-from chromadb.utils import embedding_functions
 
 from utils import *
 
 from pydantic import BaseModel, Field
-from typing import List
 
 from dotenv import load_dotenv
 from groq import Groq
 import instructor
 
-import sqlite3
-import json
-
 from pymongo import MongoClient
-from bson.objectid import ObjectId
-import math
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -26,7 +17,6 @@ load_dotenv()
 # Enable Cross-Origin Resource Sharing (CORS)
 # This is crucial to allow your React frontend (running on a different port)
 # to communicate with this Flask backend.
-CORS(app)
 
 class GeneratedSummary(BaseModel):
     summary: str = Field(

@@ -1,10 +1,8 @@
 import math
 import os
-from typing import List, Sequence, cast
+from typing import List, cast
 
 import google.generativeai as genai
-from chromadb.api.types import Document, Embedding
-from chromadb.utils import embedding_functions
 
 import dotenv
 dotenv.load_dotenv()
