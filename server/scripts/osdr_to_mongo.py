@@ -23,10 +23,9 @@ dotenv.load_dotenv()
 
 CHROMA_PATH = "server/static/chroma"
 CHROMA_COLLECTION = "osdr_experiments"
-MONGO_URI = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017')
-MONGO_DB = os.environ.get('MONGO_DB_NAME', 'medosearch')
-MONGO_COLLECTION = os.environ.get('MONGO_COLLECTION_NAME', 'research_papers')
-
+MONGO_URI = os.getenv('MONGODB_URI')
+MONGO_DB = os.environ.get('MONGO_DB_NAME', 'Gravitas-DB')
+MONGO_COLLECTION = os.environ.get('MONGO_COLLECTION_NAME', 'osdr_experiments')
 
 def iter_collection(client: Any, collection_name: str, batch_size: int = 256) -> List[Dict[str, Any]]:
     collection = client.get_collection(name=collection_name)
