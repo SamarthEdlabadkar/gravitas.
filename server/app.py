@@ -171,9 +171,30 @@ def get_node_details(doc_id: str):
     osdr_exp = mongo_db.get_collection("osdr_experiments")
     response_oe = list(osdr_exp.aggregate(pipeline))
 
+    # Format response to match frontend expectations: [document_string, metadata_object]
     data = []
-    data.extend(response_rp)
-    data.extend(response_oe)
+    
+    for doc in response_rp:
+        metadata = {
+            "pmc_id": doc.get("_id", ""),
+            "title": doc.get("title", ""),
+            "authors": doc.get("authors", []),
+        }
+        data.append([
+            doc.get("document", ""),
+            metadata
+        ])
+    
+    for doc in response_oe:
+        metadata = {
+            "osd_id": doc.get("_id", ""),
+            "title": doc.get("title", ""),
+            "authors": doc.get("authors", []),
+        }
+        data.append([
+            doc.get("document", ""),
+            metadata
+        ])
 
     return jsonify({"data": data})
 
