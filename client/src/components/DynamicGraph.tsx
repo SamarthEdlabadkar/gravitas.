@@ -1,39 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-
-// --- Type Definitions for nodes ---
-// NOTE: I've removed imageUrl from RootNodeType as it's not being passed via props in KnowledgeGraph.tsx
-type RootNodeType = {
-  id: string;
-  label: string;
-  x: number;
-  y: number;
-  isRoot: true;
-};
-
-type ChildNodeType = {
-  id:string;
-  label: string;
-  angle: number;
-  x: number;
-  y: number;
-  textX: number;
-  textY: number;
-  textAnchor: 'start' | 'middle' | 'end';
-  isRoot: false;
-};
-
-type NodeType = RootNodeType | ChildNodeType;
-
-// --- Prop Types for the component ---
-interface DynamicGraphProps {
-    rootNode: { id: string; label: string };
-    childNodes: { id: string; label: string }[];
-    onNodeClick: (nodeId: string) => void; // Modified to accept ID, consistent with KnowledgeGraph.tsx handler
-}
+import { useState, useRef, useEffect } from "react";
+import type { 
+  WrappedTextProps, 
+  DynamicGraphProps, 
+  ChildNodeType, 
+  NodeType 
+} from "@/types";
 
 
 // A helper component to handle SVG text wrapping (Keep as is)
-const WrappedText: React.FC<any> = ({ label, x, y, textAnchor, style }) => {
+const WrappedText = ({ label, x, y, textAnchor, style }: WrappedTextProps) => {
     const MAX_CHARS_PER_LINE = 20;
     const LINE_HEIGHT = 1.1; // ems
 
@@ -41,7 +16,7 @@ const WrappedText: React.FC<any> = ({ label, x, y, textAnchor, style }) => {
     const lines: string[] = [];
     let currentLine = '';
 
-    words.forEach(word => {
+    words.forEach((word: string) => {
         if ((currentLine + word).length > MAX_CHARS_PER_LINE) {
             lines.push(currentLine.trim());
             currentLine = word + ' ';
@@ -74,7 +49,7 @@ const WrappedText: React.FC<any> = ({ label, x, y, textAnchor, style }) => {
 
 
 // The core component for rendering the radial graph
-const DynamicGraph: React.FC<DynamicGraphProps> = ({ rootNode, childNodes: childNodesData, onNodeClick }) => {
+const DynamicGraph = ({ rootNode, childNodes: childNodesData, onNodeClick }: DynamicGraphProps) => {
   // --- Component State & Configuration ---
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [dimensions, setDimensions] = useState({ width: 700, height: 700 });

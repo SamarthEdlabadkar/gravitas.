@@ -1,26 +1,23 @@
 import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import chromadb
-from chromadb.utils import embedding_functions
+from utils import *
 
 from pydantic import BaseModel, Field
-from typing import List
 
 from dotenv import load_dotenv
 from groq import Groq
 import instructor
 
-import sqlite3
-import json
+from pymongo import MongoClient
 
 # Initialize the Flask application
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 load_dotenv()
 # Enable Cross-Origin Resource Sharing (CORS)
 # This is crucial to allow your React frontend (running on a different port)
 # to communicate with this Flask backend.
-CORS(app)
 
 class GeneratedSummary(BaseModel):
     summary: str = Field(
@@ -28,10 +25,9 @@ class GeneratedSummary(BaseModel):
         description="Five sentences describing the entire information"
     )
 
-def generate_embeddings(query: str):
-    ollama_embedder = embedding_functions.OllamaEmbeddingFunction(model_name="qwen3-embedding:4b")
-    return ollama_embedder([query])
-
+# create mongo client (reads MONGODB_URI from env; fallback to localhost)
+MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+print(f"Using MongoDB URI: {MONGODB_URI}")
 # --- API Endpoints ---
 
 @app.route('/search', methods=['POST'])
@@ -46,42 +42,72 @@ def search():
     
     if not query:
         return jsonify({"error": "Query parameter is required"}), 400
-
-    
-    chroma_client = chromadb.PersistentClient("server/static/chroma")
-    collection = chroma_client.get_collection(name="research_papers")
     
     embeddings = generate_embeddings(query=query)
-    
-    response = collection.query(
-        query_embeddings=embeddings,
-        n_results=25,
-        include=["metadatas", "documents"]
-    )
 
-    # Connect to the database (creates it if not exists)
-    conn = sqlite3.connect("server/static/papers.db")
-    cursor = conn.cursor()
+    mongo_client = MongoClient(MONGODB_URI)
+    db_name = os.getenv("MONGO_DB_NAME", "gravitas")
+    mongo_db = mongo_client[db_name]
 
-    # Fetch all results
-    rows = cursor.fetchall()
+    # Choose Mongo collection
+    research_papers = mongo_db.get_collection("space_biology_research_papers")
+    pipeline = [
+        {
+            "$vectorSearch": {
+                "index": "embedding-search",      # name of your vector index
+                "path": "embedding",          # field where your vector is stored
+                "queryVector": embeddings,  # input vector
+                "numCandidates": 100,
+                "limit": 25
+            }
+        },
+        {
+            "$project": {
+                "_id": 1,
+                "authors": 1,
+                "document": 1,
+                "link": 1,
+                "osdr_id": 1,
+                "title": 1,
+                "year": 1,
+                "journal": 1,
+                "score": { "$meta": "vectorSearchScore" }
+            }
+        }
+    ]
+    response = list(research_papers.aggregate(pipeline))
 
-    # Display results
-    for row in rows:
-        title, classification = row
-        classification = json.loads(classification)
+    titles = [str(doc["title"]) for doc in response]
+
+    classification_coln = mongo_db.get_collection("space_research_classification")
+    classifications = list(classification_coln.find({
+        "title": {"$in": titles}
+    }))
+
+    classification_map = {str(item["title"]): item.get("classification", {}) for item in classifications}
 
     data = []
 
-    for idx in range(len(response["documents"][0])): #type: ignore
-        cursor.execute(f"SELECT title, classification FROM classifications WHERE TITLE = '{response["metadatas"][0][idx]["title"]}'") #type:ignore
-        row = cursor.fetchone()
-        classifications = json.loads(row[1])
-        data.append((response["documents"][0][idx], response["metadatas"][0][idx], classifications)) #type: ignore
-    
-
-    # with open('searchTest.json','r', encoding='utf-8') as file:
-    #     data = json.load(file)
+    for doc in response:
+        doc_id = str(doc["title"])
+        classification = classification_map.get(doc_id, {})
+        
+        # Format response to match frontend expectations: [document_string, metadata_object, categories_array]
+        metadata = {
+            "pmc_id": doc.get("_id", ""),
+            "title": doc.get("title", ""),
+            "authors": doc.get("authors", []),
+            "year": doc.get("year", ""),
+            "journal": doc.get("journal", ""),
+            "link": doc.get("link", ""),
+        }
+        
+        # Return as tuple format: [document_text, metadata, categories]
+        data.append([
+            doc.get("document", ""),
+            metadata,
+            classification
+        ])
 
     return jsonify(data)
 
@@ -96,47 +122,79 @@ def get_node_details(doc_id: str):
     if not doc_id:
         return jsonify({"error": "Context for summary is required"}), 400
     
-    chroma_client = chromadb.PersistentClient("server/static/chroma")
-    ollama_embedder = embedding_functions.OllamaEmbeddingFunction(model_name="qwen3-embedding:4b")
 
     if doc_id[:3] == "PMC":
-        db = "research_papers"
+        col = "space_biology_research_papers"
     else:
-        db = "osdr_experiments"
+        col = "osdr_experiments"
 
-    collection = chroma_client.get_collection(name=db)
-    response = collection.query(
-        query_embeddings=ollama_embedder(["query"]),
-        n_results=1,
-        include=["metadatas", "documents"],
-        ids=[f"chunk_{doc_id}"]
-    )
+    mongo_client = MongoClient(MONGODB_URI)
+    db_name = os.getenv("MONGO_DB_NAME", "gravitas")
+    mongo_db = mongo_client[db_name]
 
-    query = str(response["documents"][0][0]) #type: ignore
+    # Choose Mongo collection
+    collection = mongo_db.get_collection(col)
 
-    query_embedding = ollama_embedder([query])
+    response = collection.find_one({"_id": str(doc_id)})
+    query = str(response["document"]) #type: ignore
+    query_embedding = generate_embeddings(query=query)
 
-    collection_rp = chroma_client.get_collection(name="research_papers")
-    response_rp = collection_rp.query(
-        query_embeddings=query_embedding,
-        n_results=8,
-        include=["metadatas", "documents"]
-    )
+    collection_rp = mongo_client = MongoClient(MONGODB_URI)
+    db_name = os.getenv("MONGO_DB_NAME", "gravitas")
+    mongo_db = mongo_client[db_name]
 
-    collection_oe = chroma_client.get_collection(name="osdr_experiments")
-    response_oe = collection_oe.query(
-        query_embeddings=query_embedding,
-        n_results=8,
-        include=["metadatas", "documents"]
-    )
+    pipeline = [
+        {
+            "$vectorSearch": {
+                "index": "embedding-search",      # name of your vector index
+                "path": "embedding",          # field where your vector is stored
+                "queryVector": query_embedding,  # input vector
+                "numCandidates": 100,
+                "limit": 8
+            }
+        },
+        {
+            "$project": {
+                "_id": 1,
+                "authors": 1,
+                "document": 1,
+                "title": 1,
+                "score": { "$meta": "vectorSearchScore" }
+            }
+        }
+    ]
 
+    # Choose Mongo collection
+    research_papers = mongo_db.get_collection("space_biology_research_papers")
+    response_rp = list(research_papers.aggregate(pipeline))
+
+    osdr_exp = mongo_db.get_collection("osdr_experiments")
+    response_oe = list(osdr_exp.aggregate(pipeline))
+
+    # Format response to match frontend expectations: [document_string, metadata_object]
     data = []
-    for idx in range(len(response_rp["documents"][0])): #type: ignore
-        data.append((response_rp["documents"][0][idx], response_rp["metadatas"][0][idx])) #type: ignore
     
-    for idx in range(len(response_oe["documents"][0])): #type: ignore
-        data.append((response_oe["documents"][0][idx], response_oe["metadatas"][0][idx])) #type: ignore
+    for doc in response_rp:
+        metadata = {
+            "pmc_id": doc.get("_id", ""),
+            "title": doc.get("title", ""),
+            "authors": doc.get("authors", []),
+        }
+        data.append([
+            doc.get("document", ""),
+            metadata
+        ])
     
+    for doc in response_oe:
+        metadata = {
+            "osd_id": doc.get("_id", ""),
+            "title": doc.get("title", ""),
+            "authors": doc.get("authors", []),
+        }
+        data.append([
+            doc.get("document", ""),
+            metadata
+        ])
 
     return jsonify({"data": data})
 
@@ -149,30 +207,27 @@ def get_summary():
     """
 
     data = request.get_json()
-    doc_id = data.get("id")
+    doc_id = str(data.get("id"))
     query = data.get("query")
 
     if not doc_id or not query:
         return jsonify({"error": "Context for summary is required"}), 400
     
-    chroma_client = chromadb.PersistentClient("server/static/chroma")
-    ollama_embedder = embedding_functions.OllamaEmbeddingFunction(model_name="qwen3-embedding:4b")
-
     if doc_id[:3] == "PMC":
-        db = "research_papers"
+        col = "space_biology_research_papers"
     else:
-        db = "osdr_experiments"
+        col = "osdr_experiments"
 
-    collection = chroma_client.get_collection(name=db)
-    response = collection.query(
-        query_embeddings=ollama_embedder(["query"]),
-        n_results=1,
-        include=["metadatas", "documents"],
-        ids=[f"chunk_{doc_id}"]
-    )
+    mongo_client = MongoClient(MONGODB_URI)
+    db_name = os.getenv("MONGO_DB_NAME", "gravitas")
+    mongo_db = mongo_client[db_name]
 
-    print(response)
-
+    collection = mongo_db.get_collection(col)
+    response = collection.find_one({"_id": str(doc_id)})
+    
+    if not response:
+        return jsonify({"error": "Document not found"}), 404
+    
     api_key = os.getenv("GROQ_API_KEY")
     client = Groq(api_key=api_key)
     client = instructor.from_groq(client, mode=instructor.Mode.JSON)
@@ -180,18 +235,18 @@ def get_summary():
     prompt: str = """
     Role and Goal: You are an expert academic research analyst. Your primary goal is to synthesize and summarize a research paper's core contribution based on its provided title, abstract, and publication date.
 
-Structure & Content Requirements:
+    Structure & Content Requirements:
 
-1.  Core Contribution : State the single most important finding or argument of the paper.
-2.  Methodology/Approach : Briefly describe the primary method, model, or approach used to conduct the research.
-3.  Key Findings : List the most significant results or conclusions.
-4.  Significance and Context : Explain why this paper is important to its field and how the publication date might offer historical context.
+    1.  Core Contribution : State the single most important finding or argument of the paper.
+    2.  Methodology/Approach : Briefly describe the primary method, model, or approach used to conduct the research.
+    3.  Key Findings : List the most significant results or conclusions.
+    4.  Significance and Context : Explain why this paper is important to its field and how the publication date might offer historical context.
 
-Tone and Style: The summary must be objective, formal, and strictly academic. Do not use conversational language or qualifiers unless absolutely necessary. 
+    Tone and Style: The summary must be objective, formal, and strictly academic. Do not use conversational language or qualifiers unless absolutely necessary. 
 
-The summary should be 5 sentences in length.
+    The summary should be 5 sentences in length.
 
-Input Data:
+    Input Data:
     """
 
     result = client.chat.completions.create(
@@ -199,7 +254,7 @@ Input Data:
         messages=[
             {
                 "role": "user",
-                "content": prompt + str(response["documents"][0][0]) + "\n\n Query: query" # type:ignore
+                "content": prompt + str(response["document"]) + "\n\n Query: query" # type:ignore
             }
         ],
         temperature=0.2,
@@ -208,9 +263,6 @@ Input Data:
     ) # type:ignore
 
     summary = result.model_dump()['summary']
-    
-    #with open('summaryTest.json','r', encoding='utf-8') as file:
-    #    summary = json.load(file)
 
     return jsonify({"summary": summary})
 
@@ -223,5 +275,4 @@ def status():
 
 
 if __name__ == '__main__':
-    # Runs the app on http://127.0.0.1:5000
     app.run(debug=True, port=5000)
