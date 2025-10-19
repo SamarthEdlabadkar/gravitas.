@@ -69,6 +69,8 @@ def search():
                 "link": 1,
                 "osdr_id": 1,
                 "title": 1,
+                "year": 1,
+                "journal": 1,
                 "score": { "$meta": "vectorSearchScore" }
             }
         }
@@ -82,14 +84,30 @@ def search():
         "title": {"$in": titles}
     }))
 
-    classification_map = {str(item["title"]): item["classification"] for item in classifications}
+    classification_map = {str(item["title"]): item.get("classification", {}) for item in classifications}
 
     data = []
 
     for doc in response:
         doc_id = str(doc["title"])
         classification = classification_map.get(doc_id, {})
-        data.append((doc, classification))
+        
+        # Format response to match frontend expectations: [document_string, metadata_object, categories_array]
+        metadata = {
+            "pmc_id": doc.get("_id", ""),
+            "title": doc.get("title", ""),
+            "authors": doc.get("authors", []),
+            "year": doc.get("year", ""),
+            "journal": doc.get("journal", ""),
+            "link": doc.get("link", ""),
+        }
+        
+        # Return as tuple format: [document_text, metadata, categories]
+        data.append([
+            doc.get("document", ""),
+            metadata,
+            classification
+        ])
 
     return jsonify(data)
 
