@@ -1,6 +1,6 @@
 import os
 from flask import Flask, jsonify, request
-
+from flask_cors import CORS
 from utils import *
 
 from pydantic import BaseModel, Field
@@ -13,6 +13,7 @@ from pymongo import MongoClient
 
 # Initialize the Flask application
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 load_dotenv()
 # Enable Cross-Origin Resource Sharing (CORS)
 # This is crucial to allow your React frontend (running on a different port)
